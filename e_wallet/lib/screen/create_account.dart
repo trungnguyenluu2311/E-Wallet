@@ -1,6 +1,8 @@
+import 'package:e_wallet/models/user_model.dart';
 import 'package:e_wallet/widget/custom_input.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CreateAccount extends StatefulWidget {
   //const CreateAccount({Key key}) : super(key: key);
@@ -35,8 +37,24 @@ class _CreateAccountState extends State<CreateAccount> {
   //Create a new user
   Future<String> _createAccount() async {
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential _authResult = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _registerEmail, password: _registerPassword);
+      if (_authResult != null && _authResult.user != null) {
+        try {
+          UserModel user = UserModel(
+            id: _authResult.user.uid,
+            email: _authResult.user.email,
+            name: _registerName,
+          );
+          await FirebaseFirestore.instance.collection("users").doc(user.id).set({
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+          });
+        } catch (e) {
+          return e.toString();
+        }
+      }
       return null;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -51,29 +69,50 @@ class _CreateAccountState extends State<CreateAccount> {
   }
 
   void _submitForm() async {
-    setState(() {
-      _registerFormLoading = true;
-    });
-
-    //run a create method
-    String _createAccountFeedback = await _createAccount();
-
-    if (_createAccountFeedback != null) {
-      _alterDialogBuilder(_createAccountFeedback);
-
-      setState(() {
-        _registerFormLoading = false;
-      });
+    if(_registerName ==""){
+      _alterDialogBuilder("Your Full name was blank");
     }
-    else {
-      Navigator.pop(context);
+    else if(_registerEmail==""){
+      _alterDialogBuilder("Your Email was blank");
+    }
+    else if(_registerPassword==""){
+      _alterDialogBuilder("Your Password was blank");
+    }
+    else if(_registerconfirmPassword==""){
+      _alterDialogBuilder("Your Confirm password was blank");
+    }
+    else if(_registerPassword != _registerconfirmPassword){
+      _alterDialogBuilder("Confirm password does not match");
+    }
+    else{
+      setState(() {
+        _registerFormLoading = true;
+      });
+
+      //run a create method
+      String _createAccountFeedback = await _createAccount();
+
+      if (_createAccountFeedback != null) {
+        _alterDialogBuilder(_createAccountFeedback);
+
+        setState(() {
+          _registerFormLoading = false;
+        });
+      }
+      else {
+        Navigator.pop(context);
+      }
     }
   }
 
   bool _registerFormLoading = false;
+  FocusNode _EmailFocusNode;
   FocusNode _passwordFocusNode;
+  FocusNode _confirmPasswordFocusNode;
+  String _registerName = "";
   String _registerEmail = "";
   String _registerPassword = "";
+  String _registerconfirmPassword = "";
 
   @override
   void initState() {
@@ -96,101 +135,124 @@ class _CreateAccountState extends State<CreateAccount> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(color: Colors.black),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Create Account',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 36,
-                      fontFamily: 'RobotoSlab',
-                      fontWeight: FontWeight.w700),
-                ),
-                SizedBox(height: 16),
-                Text('Please sign up to continue',
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Create Account',
                     style: TextStyle(
-                        color: Color(0xFF787878),
+                        color: Colors.white,
+                        fontSize: 36,
                         fontFamily: 'RobotoSlab',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700)),
-                SizedBox(height: 66),
-                CustomInput(
-                  onChange: (value) {
-                    _registerEmail = value;
-                  },
-                  onSubmitted: (value) {
-                    _passwordFocusNode.requestFocus();
-                  },
-                  hintText: "Email",
-                  textInputAction: TextInputAction.next,
-                ),
-                SizedBox(height: 16),
-                CustomInput(
-                  isPasswordField: true,
-                  onChange: (value) {
-                    _registerPassword = value;
-                  },
-                  focusNode: _passwordFocusNode,
-
-                  onSubmitted: (value) {
-                    _submitForm();
-                  },
-                  hintText: "Password",
-                ),
-                SizedBox(height: 16),
-                Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            side: BorderSide(color: Colors.red)),
-                        backgroundColor: Color(0xFFF40057),
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.fromLTRB(18, 16, 18, 16),
-                        child: Row(
-                          children: [
-                            Text(
-                              'CREATE',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontFamily: 'RobotoSlab',
-                                  fontWeight: FontWeight.w700),
-                            ),
-                            Icon(
-                              Icons.arrow_forward,
-                              size: 28,
-                              color: Colors.white,
-                            )
-                          ],
-                        ),
-                      )),
-                ]),
-                SizedBox(height: 66),
-                Center(
-                  child: RichText(
-                    text: TextSpan(
-                        text: "Already have an account?",
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFFCCCCCC),
-                            fontFamily: 'RobotoSlab',
-                            fontWeight: FontWeight.w700),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: " Sign in",
-                            style: TextStyle(
-                                color: Color(0xFFCC0047),
-                                fontWeight: FontWeight.w500),
-                          )
-                        ]),
+                        fontWeight: FontWeight.w700),
                   ),
-                ),
-              ],
+                  SizedBox(height: 16),
+                  Text('Please sign up to continue',
+                      style: TextStyle(
+                          color: Color(0xFF787878),
+                          fontFamily: 'RobotoSlab',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700)),
+                  SizedBox(height: 66),
+                  CustomInput(
+                    onChange: (value) {
+                      _registerName = value;
+                    },
+                    onSubmitted: (value) {
+                      _EmailFocusNode.requestFocus();
+                    },
+                    hintText: "Full Name",
+                    textInputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 16),
+                  CustomInput(
+                    onChange: (value) {
+                      _registerEmail = value;
+                    },
+                    onSubmitted: (value) {
+                      _passwordFocusNode.requestFocus();
+                    },
+                    hintText: "Email",
+                    textInputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 16),
+                  CustomInput(
+                    isPasswordField: true,
+                    onChange: (value) {
+                      _registerPassword = value;
+                    },
+                    onSubmitted: (value) {
+                      _confirmPasswordFocusNode.requestFocus();
+                    },
+                    hintText: "Password",
+                  ),
+                  SizedBox(height: 16),
+                  CustomInput(
+                    isPasswordField: true,
+                    onChange: (value) {
+                      _registerconfirmPassword = value;
+                    },
+                    focusNode: _confirmPasswordFocusNode,
+                    onSubmitted: (value) {
+                      _submitForm();
+                    },
+                    hintText: "Password",
+                  ),
+                  SizedBox(height: 16),
+                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    OutlinedButton(
+                        onPressed: () {_submitForm();},
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              side: BorderSide(color: Colors.red)),
+                          backgroundColor: Color(0xFFF40057),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.fromLTRB(18, 16, 18, 16),
+                          child: Row(
+                            children: [
+                              Text(
+                                'CREATE',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontFamily: 'RobotoSlab',
+                                    fontWeight: FontWeight.w700),
+                              ),
+                              Icon(
+                                Icons.arrow_forward,
+                                size: 28,
+                                color: Colors.white,
+                              )
+                            ],
+                          ),
+                        )),
+                  ]),
+                  SizedBox(height: 66),
+                  Center(
+                    child: RichText(
+                      text: TextSpan(
+                          text: "Already have an account?",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFFCCCCCC),
+                              fontFamily: 'RobotoSlab',
+                              fontWeight: FontWeight.w700),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: " Sign in",
+                              style: TextStyle(
+                                  color: Color(0xFFCC0047),
+                                  fontWeight: FontWeight.w500),
+                            )
+                          ]),
+                    ),
+                  ),
+                ],
+              ),
             ),
           )),
     );

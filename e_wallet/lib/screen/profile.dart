@@ -1,5 +1,7 @@
 import 'package:e_wallet/screen/edit_profile.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:e_wallet/screen/login_screen.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -199,13 +201,19 @@ class _ProfileState extends State<Profile> {
                     SizedBox(
                       width: 14,
                     ),
-                    Text(
-                      'Logout',
-                      style: TextStyle(
-                          color: Color(0xFFF40057),
-                          fontFamily: 'RobotoSlab',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500),
+                    GestureDetector(
+                      onTap: () {
+                        FirebaseAuth.instance.signOut();
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        'Logout',
+                        style: TextStyle(
+                            color: Color(0xFFF40057),
+                            fontFamily: 'RobotoSlab',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500),
+                      ),
                     )
                   ],
                 ),
