@@ -1,4 +1,4 @@
-import 'package:e_wallet/screen/edit_budget.dart';
+import 'package:e_wallet/screen/edit_screen/edit_budget.dart';
 import 'package:flutter/material.dart';
 
 class DetailBudget extends StatefulWidget {

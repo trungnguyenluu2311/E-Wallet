@@ -1,14 +1,14 @@
-import 'package:e_wallet/screen/repeat.dart';
-import 'package:e_wallet/screen/select_category.dart';
-import 'package:e_wallet/screen/select_wallet.dart';
+import 'package:e_wallet/screen/select_screen/repeat.dart';
+import 'package:e_wallet/screen/select_screen/select_category.dart';
+import 'package:e_wallet/screen/select_screen/select_wallet.dart';
 import 'package:flutter/material.dart';
 
-class EditBudget extends StatefulWidget {
+class AddBudget extends StatefulWidget {
   @override
-  _EditBudgetState createState() => _EditBudgetState();
+  _AddBudgetState createState() => _AddBudgetState();
 }
 
-class _EditBudgetState extends State<EditBudget> {
+class _AddBudgetState extends State<AddBudget> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -19,7 +19,7 @@ class _EditBudgetState extends State<EditBudget> {
             centerTitle: true,
             shadowColor: Colors.white,
             title: Text(
-              'Edit budget',
+              'Add budget',
               style: TextStyle(
                   color: Color(0xFFCCCCCC),
                   fontFamily: 'RobotoSlab',
@@ -153,7 +153,10 @@ class _EditBudgetState extends State<EditBudget> {
                         ),
                         GestureDetector(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>SelectCategory()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SelectCategory()));
                             },
                             child: Icon(Icons.arrow_forward_ios,
                                 color: Color(0xFF8D8E90), size: 26))

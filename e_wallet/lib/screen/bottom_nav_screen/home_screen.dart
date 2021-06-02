@@ -1,6 +1,6 @@
-import 'package:e_wallet/screen/add_wallet.dart';
-import 'package:e_wallet/screen/edit_wallet.dart';
-import 'package:e_wallet/screen/edit_transaction.dart';
+import 'package:e_wallet/screen/add_screen/add_wallet.dart';
+import 'package:e_wallet/screen/edit_screen/edit_wallet.dart';
+import 'package:e_wallet/screen/edit_screen/edit_transaction.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {

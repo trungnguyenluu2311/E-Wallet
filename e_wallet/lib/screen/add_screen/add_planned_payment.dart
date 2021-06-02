@@ -1,14 +1,15 @@
-import 'package:e_wallet/screen/repeat.dart';
-import 'package:e_wallet/screen/select_category.dart';
-import 'package:e_wallet/screen/select_wallet.dart';
+import 'package:e_wallet/screen/select_screen/confirmation.dart';
+import 'package:e_wallet/screen/select_screen/repeat.dart';
+import 'package:e_wallet/screen/select_screen/select_currency.dart';
+import 'package:e_wallet/screen/select_screen/select_wallet.dart';
 import 'package:flutter/material.dart';
 
-class AddBudget extends StatefulWidget {
+class AddPlannedPayment extends StatefulWidget {
   @override
-  _AddBudgetState createState() => _AddBudgetState();
+  _AddPlannedPaymentState createState() => _AddPlannedPaymentState();
 }
 
-class _AddBudgetState extends State<AddBudget> {
+class _AddPlannedPaymentState extends State<AddPlannedPayment> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -19,7 +20,7 @@ class _AddBudgetState extends State<AddBudget> {
             centerTitle: true,
             shadowColor: Colors.white,
             title: Text(
-              'Add budget',
+              'Add planned payment',
               style: TextStyle(
                   color: Color(0xFFCCCCCC),
                   fontFamily: 'RobotoSlab',
@@ -136,7 +137,7 @@ class _AddBudgetState extends State<AddBudget> {
                     child: Row(
                       children: [
                         Icon(
-                          Icons.help,
+                          Icons.monetization_on,
                           size: 26,
                           color: Color(0xFF8D8E90),
                         ),
@@ -144,7 +145,7 @@ class _AddBudgetState extends State<AddBudget> {
                           width: 10,
                         ),
                         Expanded(
-                          child: Text('Category',
+                          child: Text('Currency',
                               style: TextStyle(
                                   color: Color(0xFFCCCCCC),
                                   fontSize: 20,
@@ -156,7 +157,40 @@ class _AddBudgetState extends State<AddBudget> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => SelectCategory()));
+                                      builder: (context) => SelectCurrency()));
+                            },
+                            child: Icon(Icons.arrow_forward_ios,
+                                color: Color(0xFF8D8E90), size: 26))
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 3,
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(14, 14, 14, 14),
+                    decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.check,
+                          size: 26,
+                          color: Color(0xFF8D8E90),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: Text('Confirmation',
+                              style: TextStyle(
+                                  color: Color(0xFFCCCCCC),
+                                  fontSize: 20,
+                                  fontFamily: 'RobotoSlab',
+                                  fontWeight: FontWeight.w700)),
+                        ),
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>Confirmation()));
                             },
                             child: Icon(Icons.arrow_forward_ios,
                                 color: Color(0xFF8D8E90), size: 26))
@@ -227,16 +261,44 @@ class _AddBudgetState extends State<AddBudget> {
                         ),
                         GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Repeat()));
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>Repeat()));
                             },
                             child: Icon(Icons.arrow_forward_ios,
                                 color: Color(0xFF8D8E90), size: 26))
                       ],
                     ),
                   ),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(14, 14, 0, 14),
+                      child: Text(
+                        'More detail',
+                        style: TextStyle(
+                            color: Color(0xFFCCCCCC),
+                            fontFamily: 'RobotoSlab',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700),
+                      )),
+                  TextField(
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
+                        labelStyle: TextStyle(
+                            color: Color(0xFFCCCCCC),
+                            fontSize: 20,
+                            fontFamily: 'RobotoSlab',
+                            fontWeight: FontWeight.w700),
+                        labelText: 'Note',
+                        filled: true,
+                        fillColor: Color(0xFF1B1C1E),
+                        prefixIcon: Icon(
+                          Icons.note,
+                          size: 26,
+                          color: Color(0xFF8D8E90),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(0)),
+                        ),
+                      )),
                   SizedBox(height: 14),
                 ],
               ),

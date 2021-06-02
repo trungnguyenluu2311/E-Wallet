@@ -1,7 +1,7 @@
-import 'package:e_wallet/screen/confirmation.dart';
-import 'package:e_wallet/screen/repeat.dart';
-import 'package:e_wallet/screen/select_currency.dart';
-import 'package:e_wallet/screen/select_wallet.dart';
+import 'package:e_wallet/screen/select_screen/confirmation.dart';
+import 'package:e_wallet/screen/select_screen/repeat.dart';
+import 'package:e_wallet/screen/select_screen/select_currency.dart';
+import 'package:e_wallet/screen/select_screen/select_wallet.dart';
 import 'package:flutter/material.dart';
 
 class EditPlannedPayment extends StatefulWidget {

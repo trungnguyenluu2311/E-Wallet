@@ -1,12 +1,12 @@
-import 'package:e_wallet/screen/select_currency.dart';
+import 'package:e_wallet/screen/select_screen/select_currency.dart';
 import 'package:flutter/material.dart';
 
-class AddWallet extends StatefulWidget {
+class EditWallet extends StatefulWidget {
   @override
-  _AddWalletState createState() => _AddWalletState();
+  _EditWalletState createState() => _EditWalletState();
 }
 
-class _AddWalletState extends State<AddWallet> {
+class _EditWalletState extends State<EditWallet> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -17,7 +17,7 @@ class _AddWalletState extends State<AddWallet> {
             centerTitle: true,
             shadowColor: Colors.white,
             title: Text(
-              'Configure Wallet',
+              'Edit Wallet',
               style: TextStyle(
                   color: Color(0xFFCCCCCC),
                   fontFamily: 'RobotoSlab',
@@ -32,7 +32,7 @@ class _AddWalletState extends State<AddWallet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.fromLTRB(14, 14, 0, 14),
+                  padding: EdgeInsets.fromLTRB(14, 14, 0, 22),
                   child: Text(
                     'General',
                     style: TextStyle(
@@ -60,8 +60,7 @@ class _AddWalletState extends State<AddWallet> {
                         color: Color(0xFF8D8E90),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(0)),
-                      ),
+                          borderSide: BorderSide(color: Color(0xFF1A1A1A))),
                     )),
                 SizedBox(height: 2),
                 TextField(
@@ -82,8 +81,7 @@ class _AddWalletState extends State<AddWallet> {
                         color: Color(0xFF8D8E90),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(0)),
-                      ),
+                          borderSide: BorderSide(color: Color(0xFF1A1A1A))),
                     )),
                 SizedBox(
                   height: 2,

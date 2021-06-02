@@ -1,4 +1,4 @@
-import 'package:e_wallet/screen/edit_category.dart';
+import 'package:e_wallet/screen/edit_screen/edit_category.dart';
 import 'package:flutter/material.dart';
 
 class DetailCategory extends StatefulWidget {

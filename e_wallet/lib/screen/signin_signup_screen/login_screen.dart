@@ -1,4 +1,4 @@
-import 'package:e_wallet/screen/create_account.dart';
+import 'package:e_wallet/screen/signin_signup_screen/create_account.dart';
 import 'package:e_wallet/widget/custom_input.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';

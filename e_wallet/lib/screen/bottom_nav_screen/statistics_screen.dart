@@ -1,5 +1,5 @@
-import 'package:e_wallet/screen/select_time_range.dart';
-import 'package:e_wallet/screen/select_wallet.dart';
+import 'package:e_wallet/screen/select_screen/select_time_range.dart';
+import 'package:e_wallet/screen/select_screen/select_wallet.dart';
 import 'package:flutter/material.dart';
 
 class StatisticScreen extends StatefulWidget {
