@@ -1,5 +1,5 @@
-import 'package:e_wallet/screen/add_category.dart';
-import 'package:e_wallet/screen/detail_category.dart';
+import 'package:e_wallet/screen/add_screen/add_category.dart';
+import 'package:e_wallet/screen/detail_screen/detail_category.dart';
 import 'package:flutter/material.dart';
 
 class Category extends StatefulWidget {

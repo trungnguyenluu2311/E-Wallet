@@ -1,5 +1,5 @@
-import 'package:e_wallet/screen/home_screen.dart';
-import 'package:e_wallet/screen/login_screen.dart';
+import 'package:e_wallet/screen/bottom_nav_screen/home_screen.dart';
+import 'package:e_wallet/screen/signin_signup_screen/login_screen.dart';
 import 'package:e_wallet/screen/main_screen.dart';
 import 'package:e_wallet/widget/contans.dart';
 import 'package:firebase_auth/firebase_auth.dart';

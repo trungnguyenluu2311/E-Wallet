@@ -1,5 +1,5 @@
-import 'package:e_wallet/screen/add_planned_payment.dart';
-import 'package:e_wallet/screen/detail_planned_payment.dart';
+import 'package:e_wallet/screen/add_screen/add_planned_payment.dart';
+import 'package:e_wallet/screen/detail_screen/detail_planned_payment.dart';
 import 'package:flutter/material.dart';
 
 class PlannedPayments extends StatefulWidget {

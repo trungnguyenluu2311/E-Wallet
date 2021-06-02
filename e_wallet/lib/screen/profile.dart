@@ -1,7 +1,7 @@
-import 'package:e_wallet/screen/edit_profile.dart';
+import 'package:e_wallet/screen/edit_screen/edit_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:e_wallet/screen/login_screen.dart';
+import 'package:e_wallet/screen/signin_signup_screen/login_screen.dart';
 
 class Profile extends StatefulWidget {
   @override

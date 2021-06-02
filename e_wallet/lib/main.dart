@@ -1,6 +1,4 @@
 import 'package:e_wallet/screen/landing_page.dart';
-import 'package:e_wallet/screen/login_screen.dart';
-import 'package:e_wallet/screen/main_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {

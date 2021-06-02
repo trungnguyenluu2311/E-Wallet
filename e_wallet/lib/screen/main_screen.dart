@@ -1,8 +1,8 @@
-import 'package:e_wallet/screen/add_transaction.dart';
-import 'package:e_wallet/screen/home_screen.dart';
-import 'package:e_wallet/screen/more_screen.dart';
-import 'package:e_wallet/screen/planning_screen.dart';
-import 'package:e_wallet/screen/statistics_screen.dart';
+import 'package:e_wallet/screen/add_screen/add_transaction.dart';
+import 'package:e_wallet/screen/bottom_nav_screen/home_screen.dart';
+import 'package:e_wallet/screen/bottom_nav_screen/more_screen.dart';
+import 'package:e_wallet/screen/bottom_nav_screen/planning_screen.dart';
+import 'package:e_wallet/screen/bottom_nav_screen/statistics_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

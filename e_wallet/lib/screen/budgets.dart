@@ -1,5 +1,5 @@
-import 'package:e_wallet/screen/add_budget.dart';
-import 'package:e_wallet/screen/detail_budget.dart';
+import 'package:e_wallet/screen/add_screen/add_budget.dart';
+import 'package:e_wallet/screen/detail_screen/detail_budget.dart';
 import 'package:flutter/material.dart';
 
 class Budgets extends StatefulWidget {
