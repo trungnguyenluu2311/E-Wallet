@@ -1,5 +1,7 @@
 import 'package:e_wallet/screen/select_screen/select_currency.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddWallet extends StatefulWidget {
   @override
@@ -7,6 +9,50 @@ class AddWallet extends StatefulWidget {
 }
 
 class _AddWalletState extends State<AddWallet> {
+  final TextEditingController _walletnameInputCtrl = TextEditingController();
+  final TextEditingController _balancesInputCtrl = TextEditingController();
+
+  createWallet() async {
+    if(_balancesInputCtrl.text.contains("-")){
+      _alterDialogBuilder("Balances can't negative");
+    }
+    else if(_walletnameInputCtrl.text != "" && _balancesInputCtrl.text != ""){
+      await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").add({
+        "name": _walletnameInputCtrl.text.trim(),
+        "balances": _balancesInputCtrl.text.trim(),
+      }).then((value) {
+        FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).update({
+          "idwallet": value.id,
+        });
+      });
+      Navigator.pop(context);
+    }
+    else{
+      _alterDialogBuilder("Some field is missing");
+    }
+  }
+
+  Future<void> _alterDialogBuilder(String error) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Container(
+              child: Text(error),
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Close Dialog"))
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -43,48 +89,50 @@ class _AddWalletState extends State<AddWallet> {
                   ),
                 ),
                 TextField(
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
-                      labelStyle: TextStyle(
-                          color: Color(0xFFCCCCCC),
-                          fontSize: 20,
-                          fontFamily: 'RobotoSlab',
-                          fontWeight: FontWeight.w700),
-                      labelText: 'Wallet name',
-                      filled: true,
-                      fillColor: Color(0xFF1B1C1E),
-                      prefixIcon: Icon(
-                        Icons.person,
-                        size: 26,
-                        color: Color(0xFF8D8E90),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(0)),
-                      ),
-                    )),
+                  controller: _walletnameInputCtrl,
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
+                    labelStyle: TextStyle(
+                        color: Color(0xFFCCCCCC),
+                        fontSize: 20,
+                        fontFamily: 'RobotoSlab',
+                        fontWeight: FontWeight.w700),
+                    labelText: 'Wallet name',
+                    filled: true,
+                    fillColor: Color(0xFF1B1C1E),
+                    prefixIcon: Icon(
+                      Icons.account_balance_wallet_outlined,
+                      size: 26,
+                      color: Color(0xFF8D8E90),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(0)),
+                    ),
+                  )),
                 SizedBox(height: 2),
                 TextField(
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
-                      labelStyle: TextStyle(
-                          color: Color(0xFFCCCCCC),
-                          fontSize: 20,
-                          fontFamily: 'RobotoSlab',
-                          fontWeight: FontWeight.w700),
-                      labelText: 'Current balance',
-                      filled: true,
-                      fillColor: Color(0xFF1B1C1E),
-                      prefixIcon: Icon(
-                        Icons.money,
-                        size: 26,
-                        color: Color(0xFF8D8E90),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(0)),
-                      ),
-                    )),
+                  controller: _balancesInputCtrl,
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
+                    labelStyle: TextStyle(
+                        color: Color(0xFFCCCCCC),
+                        fontSize: 20,
+                        fontFamily: 'RobotoSlab',
+                        fontWeight: FontWeight.w700),
+                    labelText: 'Current balance',
+                    filled: true,
+                    fillColor: Color(0xFF1B1C1E),
+                    prefixIcon: Icon(
+                      Icons.money,
+                      size: 26,
+                      color: Color(0xFF8D8E90),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(0)),
+                    ),
+                  )),
                 SizedBox(
                   height: 2,
                 ),
@@ -102,7 +150,7 @@ class _AddWalletState extends State<AddWallet> {
                         width: 10,
                       ),
                       Expanded(
-                        child: Text('Currency',
+                        child: Text('VNĐ',
                             style: TextStyle(
                                 color: Color(0xFFCCCCCC),
                                 fontSize: 20,
@@ -138,7 +186,7 @@ class _AddWalletState extends State<AddWallet> {
                       fontSize: 18,
                       fontWeight: FontWeight.w500),
                 ),
-                onPressed: () {},
+                onPressed: () {createWallet();},
                 style: ButtonStyle(
                     backgroundColor:
                         MaterialStateProperty.all(Color(0xFF303030)),

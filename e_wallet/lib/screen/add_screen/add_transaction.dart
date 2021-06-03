@@ -1,12 +1,155 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as Path;
 
 class AddTransaction extends StatefulWidget {
+  final String idwallet;
+  final String walletname;
+  AddTransaction(this.idwallet,this.walletname);
   @override
-  _AddTransactionState createState() => _AddTransactionState();
+  _AddTransactionState createState() => _AddTransactionState(idwallet,walletname);
 }
 
 class _AddTransactionState extends State<AddTransaction> {
   dynamic _selectedType = 0;
+  final String idwallet;
+  final String walletname;
+  _AddTransactionState(this.idwallet,this.walletname);
+
+  // final TextEditingController _walletnameInputCtrl = TextEditingController();
+  final TextEditingController _transactionnameInputCtrl = TextEditingController();
+  final TextEditingController _spendingInputCtrl = TextEditingController();
+  final TextEditingController _noteInputCtrl = TextEditingController();
+  File _image;
+
+  DateTime selectedDate = DateTime.now();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _firestorage = FirebaseStorage.instance;
+  final picker = ImagePicker();
+
+  Future pickImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        print(_image);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2050),
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
+  }
+
+  Future<void> _alterDialogBuilder(String error) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Container(
+              child: Text(error),
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Close Dialog"))
+            ],
+          );
+        });
+  }
+
+  createTransaction() async {
+  if(_transactionnameInputCtrl.text != "" && _spendingInputCtrl.text != ""){
+    if(_noteInputCtrl.text != "" && _image != null){
+      print("test1");
+      Reference ref = _firestorage.ref().child(Path.basename(_image.path));
+      UploadTask uploadTask = ref.putFile(_image);
+      uploadTask.then((res) {
+        res.ref.getDownloadURL().then((fileURL) async {
+          await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).collection("transactions").add({
+          "walletname": walletname,
+          "name": _transactionnameInputCtrl.text,
+          "spending": _spendingInputCtrl.text,
+          "datespend": selectedDate,
+          "note": _noteInputCtrl.text,
+          "photo": fileURL.toString(),
+          "classify": _selectedType.toString(),
+          });
+          Navigator.pop(context);
+        });
+      });
+    }
+    else{
+      if(_noteInputCtrl.text != "" && _image == null){
+        print("test1");
+        await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).collection("transactions").add({
+          "walletname": walletname,
+          "name": _transactionnameInputCtrl.text,
+          "spending": _spendingInputCtrl.text,
+          "datespend": selectedDate,
+          "note": _noteInputCtrl.text,
+          "photo": "",
+          "classify": _selectedType.toString(),
+        });
+        Navigator.pop(context);
+      }
+      else if(_noteInputCtrl.text == "" && _image != null){
+        print("test2");
+        Reference ref = _firestorage.ref().child(Path.basename(_image.path));
+        UploadTask uploadTask = ref.putFile(_image);
+        uploadTask.then((res) {
+          res.ref.getDownloadURL().then((fileURL) async {
+            await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).collection("transactions").add({
+              "walletname": walletname,
+              "name": _transactionnameInputCtrl.text,
+              "spending": _spendingInputCtrl.text,
+              "datespend": selectedDate,
+              "note": "",
+              "photo": fileURL.toString(),
+              "classify": _selectedType.toString(),
+            });
+            Navigator.pop(context);
+          });
+        });
+      }
+      else{
+        print("test3");
+        await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).collection("transactions").add({
+          "walletname": walletname,
+          "name": _transactionnameInputCtrl.text,
+          "spending": _spendingInputCtrl.text,
+          "datespend": selectedDate,
+          "note": "",
+          "photo": "",
+          "classify": _selectedType.toString(),
+        });
+        Navigator.pop(context);
+      }
+    }
+    }
+    else{
+      _alterDialogBuilder("Some field is missing");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,32 +240,33 @@ class _AddTransactionState extends State<AddTransaction> {
                     height: 12,
                   ),
                   TextField(
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(0, 26, 0, 26),
-                        filled: true,
-                        fillColor: Color(0xFF1B1C1E),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
-                          child: Container(
-                            padding: EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(14)),
-                              color: Color(0xFF8D8E90),
-                            ),
-                            child: Text(
-                              'VNĐ',
-                              style: TextStyle(
-                                  fontFamily: 'RobotoSlab',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700),
-                            ),
+                    controller: _spendingInputCtrl,
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(0, 26, 0, 26),
+                      filled: true,
+                      fillColor: Color(0xFF1B1C1E),
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
+                        child: Container(
+                          padding: EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(14)),
+                            color: Color(0xFF8D8E90),
+                          ),
+                          child: Text(
+                            'VNĐ',
+                            style: TextStyle(
+                                fontFamily: 'RobotoSlab',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700),
                           ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(0)),
-                        ),
-                      )),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(0)),
+                      ),
+                    )),
                   Padding(
                     padding: EdgeInsets.fromLTRB(14, 14, 0, 14),
                     child: Text(
@@ -134,73 +278,108 @@ class _AddTransactionState extends State<AddTransaction> {
                           fontWeight: FontWeight.w700),
                     ),
                   ),
-                  TextField(
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
-                        labelStyle: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontSize: 20,
-                            fontFamily: 'RobotoSlab',
-                            fontWeight: FontWeight.w700),
-                        labelText: 'Wallet name',
-                        filled: true,
-                        fillColor: Color(0xFF1B1C1E),
-                        prefixIcon: Icon(
-                          Icons.person,
-                          size: 26,
-                          color: Color(0xFF8D8E90),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(0)),
-                        ),
-                      )),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(0)),
+                      color: Color(0xFF1B1C1E)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 14, 0, 14),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.account_balance_wallet_outlined,
+                            size: 26,
+                            color: Color(0xFF8D8E90),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                            child: Text(
+                              "$walletname",
+                              style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  // TextField(
+                  //     style: TextStyle(color: Colors.white, fontSize: 18),
+                  //     decoration: InputDecoration(
+                  //       contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
+                  //       labelStyle: TextStyle(
+                  //           color: Color(0xFFCCCCCC),
+                  //           fontSize: 20,
+                  //           fontFamily: 'RobotoSlab',
+                  //           fontWeight: FontWeight.w700),
+                  //       labelText: 'Wallet name',
+                  //       filled: true,
+                  //       fillColor: Color(0xFF1B1C1E),
+                  //       prefixIcon: Icon(
+                  //         Icons.account_balance_wallet_outlined,
+                  //         size: 26,
+                  //         color: Color(0xFF8D8E90),
+                  //       ),
+                  //       enabledBorder: OutlineInputBorder(
+                  //         borderRadius: BorderRadius.all(Radius.circular(0)),
+                  //       ),
+                  //     )),
                   SizedBox(height: 2),
                   TextField(
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
-                        labelStyle: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontSize: 20,
-                            fontFamily: 'RobotoSlab',
-                            fontWeight: FontWeight.w700),
-                        labelText: 'Category',
-                        filled: true,
-                        fillColor: Color(0xFF1B1C1E),
-                        prefixIcon: Icon(
-                          Icons.help,
-                          size: 26,
-                          color: Color(0xFF8D8E90),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(0)),
-                        ),
-                      )),
+                    controller: _transactionnameInputCtrl,
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
+                      labelStyle: TextStyle(
+                          color: Color(0xFFCCCCCC),
+                          fontSize: 20,
+                          fontFamily: 'RobotoSlab',
+                          fontWeight: FontWeight.w700),
+                      labelText: 'Name Transaction',
+                      filled: true,
+                      fillColor: Color(0xFF1B1C1E),
+                      prefixIcon: Icon(
+                        Icons.help,
+                        size: 26,
+                        color: Color(0xFF8D8E90),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(0)),
+                      ),
+                    )),
                   SizedBox(
                     height: 2,
                   ),
-                  TextField(
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
-                        labelStyle: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontSize: 20,
-                            fontFamily: 'RobotoSlab',
-                            fontWeight: FontWeight.w700),
-                        labelText: 'Date',
-                        filled: true,
-                        fillColor: Color(0xFF1B1C1E),
-                        prefixIcon: Icon(
-                          Icons.date_range,
-                          size: 26,
-                          color: Color(0xFF8D8E90),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(0)),
-                        ),
-                      )),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(0)),
+                        color: Color(0xFF1B1C1E)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 14, 0, 14),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: (){
+                              _selectDate(context);
+                            },
+                            child: Icon(
+                              Icons.date_range,
+                              size: 26,
+                              color: Color(0xFF8D8E90),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                            child: Text(
+                              "Day ${selectedDate.day} Month ${selectedDate.month} Year ${selectedDate.year}",
+                              style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
                   Padding(
                       padding: EdgeInsets.fromLTRB(14, 14, 0, 14),
                       child: Text(
@@ -212,6 +391,7 @@ class _AddTransactionState extends State<AddTransaction> {
                             fontWeight: FontWeight.w700),
                       )),
                   TextField(
+                    controller: _noteInputCtrl,
                       style: TextStyle(color: Colors.white, fontSize: 18),
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
@@ -233,27 +413,41 @@ class _AddTransactionState extends State<AddTransaction> {
                         ),
                       )),
                   SizedBox(height: 2),
-                  TextField(
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
-                        labelStyle: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontSize: 20,
-                            fontFamily: 'RobotoSlab',
-                            fontWeight: FontWeight.w700),
-                        labelText: 'Photo',
-                        filled: true,
-                        fillColor: Color(0xFF1B1C1E),
-                        prefixIcon: Icon(
-                          Icons.photo,
-                          size: 26,
-                          color: Color(0xFF8D8E90),
-                        ),
-                        enabledBorder: OutlineInputBorder(
+                  GestureDetector(
+                    onTap: (){
+                      pickImage();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(0)),
+                          color: Color(0xFF1B1C1E)
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 14, 0, 14),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.photo,
+                              size: 26,
+                              color: Color(0xFF8D8E90),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                              child: Text(
+                                "Photo",
+                                style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                              ),
+                            )
+                          ],
                         ),
-                      )),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: _image == null
+                        ? Text("No image selected.")
+                        : Image.file(_image),
+                  ),
                 ],
               ),
             )),
@@ -272,7 +466,7 @@ class _AddTransactionState extends State<AddTransaction> {
                       fontSize: 18,
                       fontWeight: FontWeight.w500),
                 ),
-                onPressed: () {},
+                onPressed: () {createTransaction();},
                 style: ButtonStyle(
                     backgroundColor:
                         MaterialStateProperty.all(Color(0xFF303030)),

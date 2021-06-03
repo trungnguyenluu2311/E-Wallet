@@ -1,6 +1,14 @@
 import 'package:e_wallet/screen/add_screen/add_category.dart';
 import 'package:e_wallet/screen/detail_screen/detail_category.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:e_wallet/models/wallet_model.dart';
+import 'package:e_wallet/models/user_model.dart';
+import 'package:e_wallet/models/spending_model.dart';
+import 'package:e_wallet/screen/add_screen/add_wallet.dart';
+import 'package:e_wallet/screen/edit_screen/edit_wallet.dart';
 
 class Category extends StatefulWidget {
   @override
@@ -8,302 +16,280 @@ class Category extends StatefulWidget {
 }
 
 class _CategoryState extends State<Category> {
+
+  Future<void> _alterDialogBuilder(String error) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Notification"),
+            content: Container(
+              child: Text(error),
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Close Dialog"))
+            ],
+          );
+        });
+  }
+
+  void _showDialog(String idwallet) {
+    showDialog(
+      context: this.context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              side: BorderSide(color: Color(0xFF8D8E90))),
+          title: Text(
+            "Delete wallet?",
+            style: TextStyle(color: Color(0xFF8D8E90)),
+          ),
+          content: Container(
+            child: Text(
+              "Are you sure you want to delete this wallet",
+              style: TextStyle(color: Color(0xFF8D8E90),fontSize: 18),
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(primary: Color(0xFF8D8E90)),
+              child: Text(
+                'No',
+                style: TextStyle(color: Colors.grey[50]),
+              ),
+            ),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(primary: Color(0xFF8D8E90)),
+                child: new Text(
+                  "Yes",
+                  style: TextStyle(color: Colors.grey[50]),
+                ),
+                onPressed: () => deleteWallet(idwallet)
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  choseWallet(String idwallet) async {
+    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).update({
+      "idwallet": idwallet,
+    });
+  }
+
+  deleteWallet(String idwallet) async {
+    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).collection("transactions").get().then((value) async {
+      for (DocumentSnapshot ds in value.docs){
+        final transaction = SpendingModel.fromDocumentSnapshot(documentSnapshot: ds);
+        if(transaction.photo != ""){
+          var photo = FirebaseStorage.instance.refFromURL(transaction.photo);
+          await photo.delete();
+        }
+        ds.reference.delete();
+      };
+    });
+    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).delete();
+    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).update({
+      "idwallet": "nonewallet",
+    });
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-            color: Color(0xFFCC0047),
-          ),
-          title: Text(
-            'Category',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 34,
-                fontFamily: 'RobotoSlab',
-                fontWeight: FontWeight.w700),
-          ),
-          backgroundColor: Colors.black,
-          shadowColor: Colors.white,
-        ),
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(color: Colors.black),
-          child: SingleChildScrollView(
-            child: Column(children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 24, 14, 0),
-                child: TextField(
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 12),
-                      labelStyle: TextStyle(
-                          color: Color(0xFF787878),
-                          fontSize: 20,
-                          fontFamily: 'RobotoSlab',
-                          fontWeight: FontWeight.w700),
-                      labelText: 'Search',
-                      filled: true,
-                      fillColor: Color(0xFF1B1C1E),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        size: 34,
-                        color: Color(0xFF787878),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    )),
+      child: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).snapshots(),
+        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
+          }
+          final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+            return Scaffold(
+              backgroundColor: Colors.black,
+              appBar: AppBar(
+                leading: BackButton(
+                  color: Color(0xFFCC0047),
+                ),
+                title: Text(
+                  'Wallets',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 34,
+                      fontFamily: 'RobotoSlab',
+                      fontWeight: FontWeight.w700),
+                ),
+                backgroundColor: Colors.black,
+                shadowColor: Colors.white,
               ),
-              SizedBox(height: 24),
-              Container(
+              body: Container(
                 width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.all(14),
-                decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.restaurant,
-                      size: 30,
-                      color: Color(0xFFF40057),
-                    ),
-                    SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Food & drink',
-                        style: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontFamily: 'RobotoSlab',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DetailCategory()));
-                        },
-                        child: Icon(Icons.arrow_forward_ios,
-                            color: Color(0xFF787878)))
-                  ],
+                height: MediaQuery.of(context).size.height,
+                color: Colors.black,
+                // decoration: BoxDecoration(color: Colors.black),
+                child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text(snapshot.error.toString()));
+                      }
+                      QuerySnapshot query = snapshot.data;
+                      if(query.size == 0){
+                        return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("You don't have any yet"),
+                              ],
+                            )
+                        );
+                      }
+                      else{
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          // padding: const EdgeInsets.all(14),
+                          color: Colors.black,
+                          child: ListView.builder(
+                            // physics: NeverScrollableScrollPhysics(),
+                            // shrinkWrap: true,
+                              itemCount: query.size,
+                              itemBuilder: (context, index) {
+                                final item = query.docs[index];
+                                final wallet = WalletModel.fromQueryDocumentSnapshot(queryDocSnapshot: item);
+                                return walletscard(wallet,user.idwallet);}),
+                        );
+                      }
+                    }
                 ),
               ),
-              SizedBox(
-                height: 3,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.all(14),
-                decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.shopping_cart,
-                      size: 30,
-                      color: Color(0xFFF40057),
-                    ),
-                    SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Shopping',
-                        style: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontFamily: 'RobotoSlab',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    GestureDetector(
-                        onTap: () {},
-                        child: Icon(Icons.arrow_forward_ios,
-                            color: Color(0xFF787878)))
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 3,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.all(14),
-                decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.house,
-                      size: 30,
-                      color: Color(0xFFF40057),
-                    ),
-                    SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Housing',
-                        style: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontFamily: 'RobotoSlab',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    GestureDetector(
-                        onTap: () {},
-                        child: Icon(Icons.arrow_forward_ios,
-                            color: Color(0xFF787878)))
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 3,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.all(14),
-                decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.train,
-                      size: 30,
-                      color: Color(0xFFF40057),
-                    ),
-                    SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Transportation',
-                        style: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontFamily: 'RobotoSlab',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    GestureDetector(
-                        onTap: () {},
-                        child: Icon(Icons.arrow_forward_ios,
-                            color: Color(0xFF787878)))
-                  ],
-                ),
-              ),
-              SizedBox(height: 3),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.all(14),
-                decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.movie,
-                      size: 30,
-                      color: Color(0xFFF40057),
-                    ),
-                    SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Lift & Entertainment',
-                        style: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontFamily: 'RobotoSlab',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    GestureDetector(
-                        onTap: () {},
-                        child: Icon(Icons.arrow_forward_ios,
-                            color: Color(0xFF787878)))
-                  ],
-                ),
-              ),
-              SizedBox(height: 3),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.all(14),
-                decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.money,
-                      size: 30,
-                      color: Color(0xFFF40057),
-                    ),
-                    SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Income',
-                        style: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontFamily: 'RobotoSlab',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    GestureDetector(
-                        onTap: () {},
-                        child: Icon(Icons.arrow_forward_ios,
-                            color: Color(0xFF787878)))
-                  ],
-                ),
-              ),
-              SizedBox(height: 3),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.all(14),
-                decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.more_horiz,
-                      size: 30,
-                      color: Color(0xFFF40057),
-                    ),
-                    SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: Text(
-                        'More',
-                        style: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontFamily: 'RobotoSlab',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    GestureDetector(
-                        onTap: () {},
-                        child: Icon(Icons.arrow_forward_ios,
-                            color: Color(0xFF787878)))
-                  ],
-                ),
-              ),
-            ]),
-          ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddCategory()));
-            },
-            child: Icon(Icons.add, size: 50, color: Colors.black),
-            backgroundColor: Color(0xFFF40057)),
-      ),
+              floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+              floatingActionButton: FloatingActionButton(
+                  onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => AddWallet()));},
+                  child: Icon(Icons.add, size: 50, color: Colors.black),
+                  backgroundColor: Color(0xFFF40057)),
+            );
+        }
+      )
     );
+  }
+
+  GestureDetector walletscard(WalletModel wallet,String idwalletnow){
+    if(idwalletnow == wallet.id){
+      return GestureDetector(
+          onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditWallet(wallet)));},
+          child: Column(
+            children: [
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.all(14),
+                decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.account_balance_wallet_outlined,
+                      size: 30,
+                      color: Color(0xFFF40057),
+                    ),
+                    SizedBox(
+                      width: 16,
+                    ),
+                    Expanded(
+                      child: Text(
+                        '${wallet.name}',
+                        style: TextStyle(
+                            color: Color(0xFFCCCCCC),
+                            fontFamily: 'RobotoSlab',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    GestureDetector(
+                        onTap: () {_alterDialogBuilder("This is your wallet now");},
+                        child: Icon(Icons.check_outlined,
+                            color: Color(0xFFF40057))),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                        onTap: () {_showDialog(wallet.id);},
+                        child: Icon(Icons.delete,
+                            color: Color(0xFF787878)))
+                  ],
+                ),
+              ),
+            ],
+          )
+      );
+    }
+    else{
+      return GestureDetector(
+          onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditWallet(wallet)));},
+          child: Column(
+            children: [
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.all(14),
+                decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.account_balance_wallet_outlined,
+                      size: 30,
+                      color: Color(0xFFF40057),
+                    ),
+                    SizedBox(
+                      width: 16,
+                    ),
+                    Expanded(
+                      child: Text(
+                        '${wallet.name}',
+                        style: TextStyle(
+                            color: Color(0xFFCCCCCC),
+                            fontFamily: 'RobotoSlab',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    GestureDetector(
+                        onTap: () {choseWallet(wallet.id);},
+                        child: Icon(Icons.check_outlined,
+                            color: Color(0xFF787878))),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                        onTap: () { _showDialog(wallet.id);},
+                        child: Icon(Icons.delete,
+                            color: Color(0xFF787878)))
+                  ],
+                ),
+              ),
+            ],
+          )
+      );
+    }
   }
 }

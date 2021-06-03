@@ -1,12 +1,67 @@
+import 'package:e_wallet/models/wallet_model.dart';
 import 'package:e_wallet/screen/select_screen/select_currency.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EditWallet extends StatefulWidget {
+  final WalletModel wallet;
+  EditWallet(this.wallet);
   @override
-  _EditWalletState createState() => _EditWalletState();
+  _EditWalletState createState() => _EditWalletState(wallet);
 }
 
 class _EditWalletState extends State<EditWallet> {
+  final WalletModel wallet;
+  _EditWalletState(this.wallet);
+  final TextEditingController _walletnameInputCtrl = TextEditingController();
+  final TextEditingController _balancesInputCtrl = TextEditingController();
+
+  editWallet() async {
+    if(_balancesInputCtrl.text.contains("-")){
+      _alterDialogBuilder("Balances can't negative");
+    }
+    else if(_walletnameInputCtrl.text != "" && _balancesInputCtrl.text != ""){
+      DocumentReference docRef = FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(wallet.id);
+      await docRef.update({
+        "name": _walletnameInputCtrl.text.trim(),
+        "balances": _balancesInputCtrl.text.trim(),
+      });
+      Navigator.pop(context);
+    }
+    else{
+      _alterDialogBuilder("Some field is missing");
+    }
+  }
+
+  Future<void> _alterDialogBuilder(String error) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Container(
+              child: Text(error),
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Close Dialog"))
+            ],
+          );
+        });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _walletnameInputCtrl.text = wallet.name;
+    _balancesInputCtrl.text = wallet.balances;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -32,7 +87,7 @@ class _EditWalletState extends State<EditWallet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.fromLTRB(14, 14, 0, 22),
+                  padding: EdgeInsets.fromLTRB(14, 14, 0, 14),
                   child: Text(
                     'General',
                     style: TextStyle(
@@ -43,6 +98,7 @@ class _EditWalletState extends State<EditWallet> {
                   ),
                 ),
                 TextField(
+                    controller: _walletnameInputCtrl,
                     style: TextStyle(color: Colors.white, fontSize: 18),
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
@@ -55,15 +111,17 @@ class _EditWalletState extends State<EditWallet> {
                       filled: true,
                       fillColor: Color(0xFF1B1C1E),
                       prefixIcon: Icon(
-                        Icons.person,
+                        Icons.account_balance_wallet_outlined,
                         size: 26,
                         color: Color(0xFF8D8E90),
                       ),
                       enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0xFF1A1A1A))),
+                        borderRadius: BorderRadius.all(Radius.circular(0)),
+                      ),
                     )),
                 SizedBox(height: 2),
                 TextField(
+                    controller: _balancesInputCtrl,
                     style: TextStyle(color: Colors.white, fontSize: 18),
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
@@ -81,7 +139,8 @@ class _EditWalletState extends State<EditWallet> {
                         color: Color(0xFF8D8E90),
                       ),
                       enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0xFF1A1A1A))),
+                        borderRadius: BorderRadius.all(Radius.circular(0)),
+                      ),
                     )),
                 SizedBox(
                   height: 2,
@@ -100,7 +159,7 @@ class _EditWalletState extends State<EditWallet> {
                         width: 10,
                       ),
                       Expanded(
-                        child: Text('Currency',
+                        child: Text('VNĐ',
                             style: TextStyle(
                                 color: Color(0xFFCCCCCC),
                                 fontSize: 20,
@@ -126,7 +185,7 @@ class _EditWalletState extends State<EditWallet> {
             decoration: BoxDecoration(
                 color: Color(0xFF1B1C1E),
                 border:
-                    Border(top: BorderSide(color: Colors.white, width: 0.5))),
+                Border(top: BorderSide(color: Colors.white, width: 0.5))),
             child: OutlinedButton(
                 child: Text(
                   'Save',
@@ -136,10 +195,10 @@ class _EditWalletState extends State<EditWallet> {
                       fontSize: 18,
                       fontWeight: FontWeight.w500),
                 ),
-                onPressed: () {},
+                onPressed: () {editWallet();},
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(Color(0xFF303030)),
+                    MaterialStateProperty.all(Color(0xFF303030)),
                     padding: MaterialStateProperty.all(
                         EdgeInsets.fromLTRB(0, 8, 0, 8)),
                     shape: MaterialStateProperty.all(RoundedRectangleBorder(

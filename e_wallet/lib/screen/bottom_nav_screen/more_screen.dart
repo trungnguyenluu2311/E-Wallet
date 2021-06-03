@@ -73,12 +73,12 @@ class _MoreScreenState extends State<MoreScreen> {
                       decoration: BoxDecoration(
                           color: Color(0xFFF40057),
                           borderRadius: BorderRadius.all(Radius.circular(10))),
-                      child: Icon(Icons.list, size: 50)),
+                      child: Icon(Icons.account_balance_wallet_outlined, size: 50)),
                   SizedBox(
                     height: 6,
                   ),
                   Text(
-                    'Category',
+                    'Wallets',
                     style: TextStyle(
                       color: Color(0xFFCCCCCC),
                       fontFamily: 'RobotoSlab',

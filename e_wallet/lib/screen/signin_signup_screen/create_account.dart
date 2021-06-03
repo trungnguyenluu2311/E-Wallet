@@ -45,11 +45,13 @@ class _CreateAccountState extends State<CreateAccount> {
             id: _authResult.user.uid,
             email: _authResult.user.email,
             name: _registerName,
+            idwallet: "nonewallet",
           );
           await FirebaseFirestore.instance.collection("users").doc(user.id).set({
             "id": user.id,
             "name": user.name,
             "email": user.email,
+            "idwallet": user.idwallet,
           });
         } catch (e) {
           return e.toString();

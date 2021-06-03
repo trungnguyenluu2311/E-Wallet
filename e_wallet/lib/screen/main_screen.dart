@@ -1,3 +1,4 @@
+import 'package:e_wallet/models/user_model.dart';
 import 'package:e_wallet/screen/add_screen/add_transaction.dart';
 import 'package:e_wallet/screen/bottom_nav_screen/home_screen.dart';
 import 'package:e_wallet/screen/bottom_nav_screen/more_screen.dart';
@@ -5,6 +6,9 @@ import 'package:e_wallet/screen/bottom_nav_screen/planning_screen.dart';
 import 'package:e_wallet/screen/bottom_nav_screen/statistics_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:e_wallet/models/wallet_model.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -25,6 +29,27 @@ class _MainScreenState extends State<MainScreen> {
     'Statistics',
     'More',
   ];
+
+  Future<void> _alterDialogBuilder(String error) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Container(
+              child: Text(error),
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Close Dialog"))
+            ],
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,14 +110,49 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddTransaction()));
-            },
-            child: Icon(Icons.add, size: 50, color: Colors.black),
-            backgroundColor: Color(0xFFF40057)
-            ),
+        floatingActionButton: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).snapshots(),
+          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text(snapshot.error.toString()));
+            }
+            final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+            if(user.idwallet =="nonewallet"){
+              return FloatingActionButton(
+                  heroTag: Text("btnaddspending"),
+                  onPressed: () {_alterDialogBuilder("You don't have any wallet");},
+                  child: Icon(Icons.add, size: 50, color: Colors.black),
+                  backgroundColor: Color(0xFFF40057)
+              );
+            }
+            else{
+              return StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance.collection("users").doc(user.id).collection("wallets").doc(user.idwallet).snapshots(),
+                builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text(snapshot.error.toString()));
+                  }
+                  final WalletModel wallet = WalletModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                  return FloatingActionButton(
+                      heroTag: Text("btnaddspending"),
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => AddTransaction(user.idwallet,wallet.name)));
+                      },
+                      child: Icon(Icons.add, size: 50, color: Colors.black),
+                      backgroundColor: Color(0xFFF40057)
+                  );
+                }
+              );
+            }
+          }
+        ),
       ),
     );
   }
