@@ -38,7 +38,7 @@ class _CategoryState extends State<Category> {
         });
   }
 
-  void _showDialog(String idwallet) {
+  void _showDialog(String idwallet,String idwalletnow) {
     showDialog(
       context: this.context,
       builder: (BuildContext context) {
@@ -74,7 +74,7 @@ class _CategoryState extends State<Category> {
                   "Yes",
                   style: TextStyle(color: Colors.grey[50]),
                 ),
-                onPressed: () => deleteWallet(idwallet)
+                onPressed: () => deleteWallet(idwallet,idwalletnow)
             ),
           ],
         );
@@ -88,7 +88,7 @@ class _CategoryState extends State<Category> {
     });
   }
 
-  deleteWallet(String idwallet) async {
+  deleteWallet(String idwallet,String idwalletnow) async {
     await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).collection("transactions").get().then((value) async {
       for (DocumentSnapshot ds in value.docs){
         final transaction = SpendingModel.fromDocumentSnapshot(documentSnapshot: ds);
@@ -100,9 +100,19 @@ class _CategoryState extends State<Category> {
       };
     });
     await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).delete();
-    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).update({
-      "idwallet": "nonewallet",
-    });
+    if(idwallet == idwalletnow){
+      await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").orderBy("datecreated",descending: true).get().then((value) async {
+        if(value.size > 0){
+          await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).update({
+          "idwallet": value.docs.first.id,
+        });}
+        else{
+          await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).update({
+          "idwallet": "nonewallet",
+        });
+        }
+      });
+    }
     Navigator.pop(context);
   }
 
@@ -142,7 +152,7 @@ class _CategoryState extends State<Category> {
                 color: Colors.black,
                 // decoration: BoxDecoration(color: Colors.black),
                 child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").snapshots(),
+                    stream: FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").orderBy("datecreated",descending: true).snapshots(),
                     builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
@@ -156,7 +166,8 @@ class _CategoryState extends State<Category> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text("You don't have any yet"),
+                                Text("You don't have any wallet yet",
+                                style: TextStyle(color: Color(0xFF787878),fontSize: 25),),
                               ],
                             )
                         );
@@ -231,7 +242,7 @@ class _CategoryState extends State<Category> {
                       width: 10,
                     ),
                     GestureDetector(
-                        onTap: () {_showDialog(wallet.id);},
+                        onTap: () {_showDialog(wallet.id,idwalletnow);},
                         child: Icon(Icons.delete,
                             color: Color(0xFF787878)))
                   ],
@@ -281,7 +292,7 @@ class _CategoryState extends State<Category> {
                       width: 10,
                     ),
                     GestureDetector(
-                        onTap: () { _showDialog(wallet.id);},
+                        onTap: () { _showDialog(wallet.id,idwalletnow);},
                         child: Icon(Icons.delete,
                             color: Color(0xFF787878)))
                   ],

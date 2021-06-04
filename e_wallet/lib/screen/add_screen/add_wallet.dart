@@ -20,6 +20,7 @@ class _AddWalletState extends State<AddWallet> {
       await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").add({
         "name": _walletnameInputCtrl.text.trim(),
         "balances": _balancesInputCtrl.text.trim(),
+        "datecreated": DateTime.now(),
       }).then((value) {
         FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).update({
           "idwallet": value.id,

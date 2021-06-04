@@ -126,7 +126,7 @@ class _EditTransactionState extends State<EditTransaction> {
     _transactionnameInputCtrl.text = spendingModel.name;
     _spendingInputCtrl.text = spendingModel.spending;
     _noteInputCtrl.text = spendingModel.note;
-    File _image;
+    _selectedType = int.parse(spendingModel.classify);
     selectedDate = spendingModel.datespend;
   }
 
