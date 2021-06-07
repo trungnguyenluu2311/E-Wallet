@@ -10,6 +10,7 @@ class SpendingModel {
   String note;
   String photo;
   String classify;
+  String idcategory;
 
   SpendingModel({
     this.id,
@@ -20,6 +21,7 @@ class SpendingModel {
     this.note,
     this.photo,
     this.classify,
+    this.idcategory,
   });
 
   SpendingModel.fromDocumentSnapshot({DocumentSnapshot documentSnapshot}) {
@@ -32,7 +34,7 @@ class SpendingModel {
     note = documentSnapshot["note"];
     photo = documentSnapshot["photo"];
     classify = documentSnapshot["classify"];
-    // currency = documentSnapshot["currency"];
+    idcategory = documentSnapshot["idcategory"];
   }
 
   SpendingModel.fromQueryDocumentSnapshot({QueryDocumentSnapshot queryDocSnapshot}) {
@@ -46,6 +48,6 @@ class SpendingModel {
     note = data["note"];
     photo = data["photo"];
     classify = data["classify"];
-    // currency = data["currency"];
+    idcategory = data["idcategory"];
   }
 }

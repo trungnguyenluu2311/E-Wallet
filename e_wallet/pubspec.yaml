@@ -38,6 +38,7 @@ dev_dependencies:
   cloud_firestore: "^0.16.0+1"
   firebase_auth: "^0.20.1"
   firebase_storage:
+  flutter_colorpicker: ^0.4.0
   intl:
   image_picker:
 # For information on the generic Dart part of this file, see the

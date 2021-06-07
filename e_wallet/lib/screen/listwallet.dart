@@ -1,19 +1,21 @@
-import 'package:e_wallet/models/category_model.dart';
+import 'package:e_wallet/screen/add_screen/add_category.dart';
+import 'package:e_wallet/screen/detail_screen/detail_category.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:e_wallet/models/wallet_model.dart';
+import 'package:e_wallet/models/user_model.dart';
+import 'package:e_wallet/models/spending_model.dart';
+import 'package:e_wallet/screen/add_screen/add_wallet.dart';
+import 'package:e_wallet/screen/edit_screen/edit_wallet.dart';
 
-
-class SelectCategory extends StatefulWidget {
-  String idcategorynow;
-  SelectCategory(this.idcategorynow);
+class Listwallet extends StatefulWidget {
   @override
-  _SelectCategoryState createState() => _SelectCategoryState(idcategorynow);
+  _ListwalletState createState() => _ListwalletState();
 }
 
-class _SelectCategoryState extends State<SelectCategory> {
-  String idcategorynow;
-  _SelectCategoryState(this.idcategorynow);
+class _ListwalletState extends State<Listwallet> {
 
   Future<void> _alterDialogBuilder(String error) async {
     return showDialog(
@@ -36,8 +38,82 @@ class _SelectCategoryState extends State<SelectCategory> {
         });
   }
 
-  choseCategory(CategoryModel category) async {
-    Navigator.pop(context, "${category.id}");
+  void _showDialog(String idwallet,String idwalletnow) {
+    showDialog(
+      context: this.context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              side: BorderSide(color: Color(0xFF8D8E90))),
+          title: Text(
+            "Delete wallet?",
+            style: TextStyle(color: Color(0xFF8D8E90)),
+          ),
+          content: Container(
+            child: Text(
+              "Are you sure you want to delete this wallet",
+              style: TextStyle(color: Color(0xFF8D8E90),fontSize: 18),
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(primary: Color(0xFF8D8E90)),
+              child: Text(
+                'No',
+                style: TextStyle(color: Colors.grey[50]),
+              ),
+            ),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(primary: Color(0xFF8D8E90)),
+                child: new Text(
+                  "Yes",
+                  style: TextStyle(color: Colors.grey[50]),
+                ),
+                onPressed: () => deleteWallet(idwallet,idwalletnow)
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  choseWallet(String idwallet) async {
+    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).update({
+      "idwallet": idwallet,
+    });
+  }
+
+  deleteWallet(String idwallet,String idwalletnow) async {
+    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).collection("transactions").get().then((value) async {
+      for (DocumentSnapshot ds in value.docs){
+        final transaction = SpendingModel.fromDocumentSnapshot(documentSnapshot: ds);
+        if(transaction.photo != ""){
+          var photo = FirebaseStorage.instance.refFromURL(transaction.photo);
+          await photo.delete();
+        }
+        ds.reference.delete();
+      };
+    });
+    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).delete();
+    if(idwallet == idwalletnow){
+      await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").orderBy("datecreated",descending: true).get().then((value) async {
+        if(value.size > 0){
+          await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).update({
+            "idwallet": value.docs.first.id,
+          });}
+        else{
+          await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).update({
+            "idwallet": "nonewallet",
+          });
+        }
+      });
+    }
+    Navigator.pop(context);
   }
 
   @override
@@ -52,18 +128,15 @@ class _SelectCategoryState extends State<SelectCategory> {
               if (snapshot.hasError) {
                 return Center(child: Text(snapshot.error.toString()));
               }
+              final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
               return Scaffold(
                 backgroundColor: Colors.black,
                 appBar: AppBar(
                   leading: BackButton(
                     color: Color(0xFFCC0047),
-                    // color: Colors.red,
-                    onPressed: (){
-                      Navigator.pop(context, "$idcategorynow");
-                    },
                   ),
                   title: Text(
-                    'Choose Category',
+                    'Wallets',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 34,
@@ -79,7 +152,7 @@ class _SelectCategoryState extends State<SelectCategory> {
                   color: Colors.black,
                   // decoration: BoxDecoration(color: Colors.black),
                   child: StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("categorys").snapshots(),
+                      stream: FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").orderBy("datecreated",descending: true).snapshots(),
                       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator());
@@ -93,7 +166,7 @@ class _SelectCategoryState extends State<SelectCategory> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text("You don't have any category yet",
+                                  Text("You don't have any wallet yet",
                                     style: TextStyle(color: Color(0xFF787878),fontSize: 25),),
                                 ],
                               )
@@ -110,23 +183,28 @@ class _SelectCategoryState extends State<SelectCategory> {
                                 itemCount: query.size,
                                 itemBuilder: (context, index) {
                                   final item = query.docs[index];
-                                  final category = CategoryModel.fromQueryDocumentSnapshot(queryDocSnapshot: item);
-                                  return categorycard(category,idcategorynow);}),
-                            // return Text("hi");}),
+                                  final wallet = WalletModel.fromQueryDocumentSnapshot(queryDocSnapshot: item);
+                                  return walletscard(wallet,user.idwallet);}),
                           );
                         }
                       }
                   ),
                 ),
+                floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+                floatingActionButton: FloatingActionButton(
+                    onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => AddWallet()));},
+                    child: Icon(Icons.add, size: 50, color: Colors.black),
+                    backgroundColor: Color(0xFFF40057)),
               );
             }
         )
     );
   }
 
-  GestureDetector categorycard(CategoryModel category,String idcategorynow){
-    if(idcategorynow == category.id){
+  GestureDetector walletscard(WalletModel wallet,String idwalletnow){
+    if(idwalletnow == wallet.id){
       return GestureDetector(
+          onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditWallet(wallet)));},
           child: Column(
             children: [
               SizedBox(
@@ -139,17 +217,16 @@ class _SelectCategoryState extends State<SelectCategory> {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.circle,
+                      Icons.account_balance_wallet_outlined,
                       size: 30,
-                      color: Color(int.parse(category.color)),
-                      // color: Color(0xFFF40057),
+                      color: Color(0xFFF40057),
                     ),
                     SizedBox(
                       width: 16,
                     ),
                     Expanded(
                       child: Text(
-                        '${category.name}',
+                        '${wallet.name}',
                         style: TextStyle(
                             color: Color(0xFFCCCCCC),
                             fontFamily: 'RobotoSlab',
@@ -157,21 +234,27 @@ class _SelectCategoryState extends State<SelectCategory> {
                             fontWeight: FontWeight.w500),
                       ),
                     ),
+                    GestureDetector(
+                        onTap: () {_alterDialogBuilder("This is your wallet now");},
+                        child: Icon(Icons.check_outlined,
+                            color: Color(0xFFF40057))),
                     SizedBox(
                       width: 10,
                     ),
                     GestureDetector(
-                        onTap: () {_alterDialogBuilder("This is your category now");},
-                        child: Icon(Icons.check_outlined,
-                            color: Color(0xFFF40057))),
+                        onTap: () {_showDialog(wallet.id,idwalletnow);},
+                        child: Icon(Icons.delete,
+                            color: Color(0xFF787878)))
                   ],
                 ),
               ),
             ],
           )
       );
-    }else{
+    }
+    else{
       return GestureDetector(
+          onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditWallet(wallet)));},
           child: Column(
             children: [
               SizedBox(
@@ -184,17 +267,16 @@ class _SelectCategoryState extends State<SelectCategory> {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.circle,
+                      Icons.account_balance_wallet_outlined,
                       size: 30,
-                      color: Color(int.parse(category.color)),
-                      // color: Color(0xFFF40057),
+                      color: Color(0xFFF40057),
                     ),
                     SizedBox(
                       width: 16,
                     ),
                     Expanded(
                       child: Text(
-                        '${category.name}',
+                        '${wallet.name}',
                         style: TextStyle(
                             color: Color(0xFFCCCCCC),
                             fontFamily: 'RobotoSlab',
@@ -202,12 +284,16 @@ class _SelectCategoryState extends State<SelectCategory> {
                             fontWeight: FontWeight.w500),
                       ),
                     ),
+                    GestureDetector(
+                        onTap: () {choseWallet(wallet.id);},
+                        child: Icon(Icons.check_outlined,
+                            color: Color(0xFF787878))),
                     SizedBox(
                       width: 10,
                     ),
                     GestureDetector(
-                        onTap: () {choseCategory(category);},
-                        child: Icon(Icons.check_outlined,
+                        onTap: () { _showDialog(wallet.id,idwalletnow);},
+                        child: Icon(Icons.delete,
                             color: Color(0xFF787878)))
                   ],
                 ),

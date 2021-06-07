@@ -153,7 +153,7 @@ class _EditBudgetState extends State<EditBudget> {
                         ),
                         GestureDetector(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>SelectCategory()));
+                              // Navigator.push(context, MaterialPageRoute(builder: (context)=>SelectCategory()));
                             },
                             child: Icon(Icons.arrow_forward_ios,
                                 color: Color(0xFF8D8E90), size: 26))

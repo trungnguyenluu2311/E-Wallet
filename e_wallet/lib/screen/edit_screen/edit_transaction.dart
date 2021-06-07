@@ -1,4 +1,6 @@
+import 'package:e_wallet/models/category_model.dart';
 import 'package:e_wallet/models/spending_model.dart';
+import 'package:e_wallet/screen/select_screen/select_category.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -26,7 +28,7 @@ class _EditTransactionState extends State<EditTransaction> {
   final TextEditingController _spendingInputCtrl = TextEditingController();
   final TextEditingController _noteInputCtrl = TextEditingController();
   File _image;
-
+  String idtemptransaction = "nonecategory";
   DateTime selectedDate = DateTime.now();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _firestorage = FirebaseStorage.instance;
@@ -97,6 +99,7 @@ class _EditTransactionState extends State<EditTransaction> {
               "note": _noteInputCtrl.text,
               "photo": fileURL.toString(),
               "classify": _selectedType.toString(),
+              "idcategory": idtemptransaction,
             });
             Navigator.pop(context);
           });
@@ -110,6 +113,7 @@ class _EditTransactionState extends State<EditTransaction> {
           "datespend": selectedDate,
           "note": _noteInputCtrl.text,
           "classify": _selectedType.toString(),
+          "idcategory": idtemptransaction,
         });
         Navigator.pop(context);
       }
@@ -117,6 +121,13 @@ class _EditTransactionState extends State<EditTransaction> {
     else{
       _alterDialogBuilder("Some field is missing");
     }
+  }
+
+  void _choosecategory(BuildContext context) async {
+    final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => SelectCategory(idtemptransaction)),);
+    setState(() {
+      idtemptransaction = result;
+    });
   }
 
   @override
@@ -128,6 +139,7 @@ class _EditTransactionState extends State<EditTransaction> {
     _noteInputCtrl.text = spendingModel.note;
     _selectedType = int.parse(spendingModel.classify);
     selectedDate = spendingModel.datespend;
+    idtemptransaction = spendingModel.idcategory;
   }
 
   @override
@@ -140,7 +152,7 @@ class _EditTransactionState extends State<EditTransaction> {
             centerTitle: true,
             shadowColor: Colors.white,
             title: Text(
-              'Add transaction',
+              'Edit transaction',
               style: TextStyle(
                   color: Color(0xFFCCCCCC),
                   fontFamily: 'RobotoSlab',
@@ -282,27 +294,6 @@ class _EditTransactionState extends State<EditTransaction> {
                       ),
                     ),
                   ),
-                  // TextField(
-                  //     style: TextStyle(color: Colors.white, fontSize: 18),
-                  //     decoration: InputDecoration(
-                  //       contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
-                  //       labelStyle: TextStyle(
-                  //           color: Color(0xFFCCCCCC),
-                  //           fontSize: 20,
-                  //           fontFamily: 'RobotoSlab',
-                  //           fontWeight: FontWeight.w700),
-                  //       labelText: 'Wallet name',
-                  //       filled: true,
-                  //       fillColor: Color(0xFF1B1C1E),
-                  //       prefixIcon: Icon(
-                  //         Icons.account_balance_wallet_outlined,
-                  //         size: 26,
-                  //         color: Color(0xFF8D8E90),
-                  //       ),
-                  //       enabledBorder: OutlineInputBorder(
-                  //         borderRadius: BorderRadius.all(Radius.circular(0)),
-                  //       ),
-                  //     )),
                   SizedBox(height: 2),
                   TextField(
                       controller: _transactionnameInputCtrl,
@@ -326,6 +317,68 @@ class _EditTransactionState extends State<EditTransaction> {
                           borderRadius: BorderRadius.all(Radius.circular(0)),
                         ),
                       )),
+                  SizedBox(
+                    height: 2,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(0)),
+                        color: Color(0xFF1B1C1E)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 14, 0, 14),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: (){
+                              _choosecategory(context);
+                            },
+                            child: Icon(
+                              Icons.category,
+                              size: 26,
+                              color: Color(0xFF8D8E90),
+                            ),
+                          ),
+                          StreamBuilder<DocumentSnapshot>(
+                              stream: FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("categorys").doc(idtemptransaction).snapshots(),
+                              builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                    child: Text(
+                                      "Choose Category",
+                                      style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                                    ),
+                                  );
+                                  // return Center(child: CircularProgressIndicator());
+                                }
+                                if (snapshot.hasError) {
+                                  return Center(child: Text(snapshot.error.toString()));
+                                }
+                                if(!snapshot.data.exists){
+                                  return Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                    child: Text(
+                                      "Choose Category",
+                                      style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                                    ),
+                                  );
+                                }else{
+                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                  return Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                    child: Text(
+                                      "${category.name}",
+                                      style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                                    ),
+                                  );
+                                }
+                              }
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   SizedBox(
                     height: 2,
                   ),

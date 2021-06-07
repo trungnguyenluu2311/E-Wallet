@@ -1,11 +1,70 @@
+import 'package:e_wallet/models/category_model.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class EditCategory extends StatefulWidget {
+  final CategoryModel category;
+  EditCategory(this.category);
   @override
-  _EditCategoryState createState() => _EditCategoryState();
+  _EditCategoryState createState() => _EditCategoryState(category);
 }
 
 class _EditCategoryState extends State<EditCategory> {
+  final CategoryModel category;
+  _EditCategoryState(this.category);
+
+  Color currentColor;
+  void changeColor(Color color) => setState(() => currentColor = color);
+  final TextEditingController _categorynameInputCtrl = TextEditingController();
+  final TextEditingController _noteInputCtrl = TextEditingController();
+
+  editCategory() async {
+    if(_categorynameInputCtrl.text != ""){
+      DocumentReference docRef = FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("categorys").doc(category.id);
+      await docRef.update({
+        "name": _categorynameInputCtrl.text.trim(),
+        "note": _noteInputCtrl.text.trim(),
+        "color": currentColor.value.toString(),
+      });
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }
+    else{
+      _alterDialogBuilder("Some field is missing");
+    }
+  }
+
+  Future<void> _alterDialogBuilder(String error) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Container(
+              child: Text(error),
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Close Dialog"))
+            ],
+          );
+        });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    currentColor = Color(int.parse(category.color));
+    _categorynameInputCtrl.text = category.name;
+    _noteInputCtrl.text = category.note;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -37,13 +96,35 @@ class _EditCategoryState extends State<EditCategory> {
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
                     child: Column(children: [
-                      Icon(
-                        Icons.restaurant,
-                        size: 40,
-                        color: Color(0xFFF40057),
+                      GestureDetector(
+                        onTap: (){
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Select a color',style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 18,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),),
+                                backgroundColor: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(color: Color(0xFFCCCCCC))),
+                                content: SingleChildScrollView(
+                                  child: BlockPicker(
+                                    pickerColor: currentColor,
+                                    onColorChanged: changeColor,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                          print("$currentColor");
+                        },
+                        child: Icon(
+                          Icons.circle,
+                          size: 60,
+                          color: currentColor,
+                        ),
                       ),
                       Text(
-                        'Food & drink',
+                        "${category.name}",
                         style: TextStyle(
                             color: Colors.white,
                             fontFamily: 'RobotoSlab',
@@ -64,6 +145,7 @@ class _EditCategoryState extends State<EditCategory> {
                     ),
                   ),
                   TextField(
+                    controller: _categorynameInputCtrl,
                       style: TextStyle(color: Colors.white, fontSize: 18),
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
@@ -85,6 +167,7 @@ class _EditCategoryState extends State<EditCategory> {
                         ),
                       )),
                   TextField(
+                    controller: _noteInputCtrl,
                       style: TextStyle(color: Colors.white, fontSize: 18),
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
@@ -123,7 +206,7 @@ class _EditCategoryState extends State<EditCategory> {
                       fontSize: 18,
                       fontWeight: FontWeight.w500),
                 ),
-                onPressed: () {},
+                onPressed: () {editCategory();},
                 style: ButtonStyle(
                     backgroundColor:
                         MaterialStateProperty.all(Color(0xFF303030)),

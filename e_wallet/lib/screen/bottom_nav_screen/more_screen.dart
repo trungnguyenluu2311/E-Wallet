@@ -1,5 +1,6 @@
 import 'package:e_wallet/screen/category.dart';
 import 'package:e_wallet/screen/convert_currency.dart';
+import 'package:e_wallet/screen/listwallet.dart';
 import 'package:e_wallet/screen/profile.dart';
 import 'package:flutter/material.dart';
 
@@ -59,7 +60,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 child: GestureDetector(
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Category()));
+                    MaterialPageRoute(builder: (context) => Listwallet()));
               },
               child: Container(
                 padding: EdgeInsets.all(30),
@@ -92,6 +93,41 @@ class _MoreScreenState extends State<MoreScreen> {
           ]),
           SizedBox(height: 12),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Category()));
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(30),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF1B1C1E),
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
+                    child: Column(children: [
+                      Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                              color: Color(0xFF0984FB),
+                              borderRadius: BorderRadius.all(Radius.circular(10))),
+                          child: Icon(Icons.category_outlined, size: 50,)),
+                      SizedBox(
+                        height: 6,
+                      ),
+                      Text(
+                        'Category',
+                        style: TextStyle(
+                          color: Color(0xFFCCCCCC),
+                          fontFamily: 'RobotoSlab',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )
+                    ]),
+                  ),
+                )),
+            SizedBox(width: 12),
             Expanded(
               child: GestureDetector(
                 onTap: () {
@@ -132,35 +168,6 @@ class _MoreScreenState extends State<MoreScreen> {
                 ),
               ),
             ),
-            SizedBox(width: 12),
-            Expanded(
-                child: Container(
-              padding: EdgeInsets.all(30),
-              decoration: BoxDecoration(
-                color: Color(0xFF1B1C1E),
-                borderRadius: BorderRadius.all(Radius.circular(16)),
-              ),
-              child: Column(children: [
-                Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                        color: Color(0xFF0984FB),
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    child: Icon(Icons.live_help, size: 50)),
-                SizedBox(
-                  height: 6,
-                ),
-                Text(
-                  'Help',
-                  style: TextStyle(
-                    color: Color(0xFFCCCCCC),
-                    fontFamily: 'RobotoSlab',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                )
-              ]),
-            ))
           ]),
         ]));
   }
