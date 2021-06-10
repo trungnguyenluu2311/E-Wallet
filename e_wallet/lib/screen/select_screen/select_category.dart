@@ -40,6 +40,10 @@ class _SelectCategoryState extends State<SelectCategory> {
     Navigator.pop(context, "${category.id}");
   }
 
+  deletechoseCategory() async {
+    Navigator.pop(context, "nonecategory");
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -62,6 +66,20 @@ class _SelectCategoryState extends State<SelectCategory> {
                       Navigator.pop(context, "$idcategorynow");
                     },
                   ),
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 10, 5, 0),
+                      child: GestureDetector(
+                          onTap: () {
+                            deletechoseCategory();
+                          },
+                          child: Icon(
+                            Icons.delete,
+                            size: 28,
+                            color: Color(0xFFCC0047),
+                          )),
+                    )
+                  ],
                   title: Text(
                     'Choose Category',
                     style: TextStyle(

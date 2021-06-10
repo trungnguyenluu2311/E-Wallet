@@ -33,6 +33,7 @@ class _EditTransactionState extends State<EditTransaction> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _firestorage = FirebaseStorage.instance;
   final picker = ImagePicker();
+  // Color colorTemp = Color(0xFF8D8E90);
 
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
@@ -365,11 +366,12 @@ class _EditTransactionState extends State<EditTransaction> {
                                   );
                                 }else{
                                   final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                  // colorTemp = Color(int.parse(category.color));
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                     child: Text(
                                       "${category.name}",
-                                      style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                                      style: TextStyle(color: Color(int.parse(category.color)), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
                                     ),
                                   );
                                 }
