@@ -1,14 +1,80 @@
-import 'package:e_wallet/screen/select_screen/repeat.dart';
+import 'package:e_wallet/models/category_model.dart';
+import 'package:e_wallet/screen/select_screen/confirmation.dart';
 import 'package:e_wallet/screen/select_screen/select_category.dart';
-import 'package:e_wallet/screen/select_screen/select_wallet.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddBudget extends StatefulWidget {
+  final String idwallet;
+  final String walletname;
+  AddBudget(this.idwallet,this.walletname);
   @override
-  _AddBudgetState createState() => _AddBudgetState();
+  _AddBudgetState createState() => _AddBudgetState(idwallet,walletname);
 }
 
 class _AddBudgetState extends State<AddBudget> {
+  dynamic _selectedType = 0;
+  final String idwallet;
+  final String walletname;
+  _AddBudgetState(this.idwallet,this.walletname);
+
+  final TextEditingController _transactionnameInputCtrl = TextEditingController();
+  final TextEditingController _spendingInputCtrl = TextEditingController();
+  String idtemptransaction = "nonecategory";
+
+  DateTime selectedDate = DateTime.now();
+
+
+  Future<void> _alterDialogBuilder(String error) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Container(
+              child: Text(error),
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Close Dialog"))
+            ],
+          );
+        });
+  }
+
+  void _choosecategory(BuildContext context) async {
+    final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => SelectCategory(idtemptransaction)),);
+    setState(() {
+      idtemptransaction = result;
+    });
+  }
+
+  createTransaction() async {
+    if(_transactionnameInputCtrl.text != "" && _spendingInputCtrl.text != "" ){
+      if(idtemptransaction != "nonecategory"){
+        await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("wallets").doc(idwallet).collection("budgets").add({
+          "walletname": walletname,
+          "name": _transactionnameInputCtrl.text,
+          "spending": _spendingInputCtrl.text,
+          "datespend": selectedDate,
+          "idcategory": idtemptransaction,
+        });
+        Navigator.pop(context);
+      }
+      else{
+        _alterDialogBuilder("You need to choose category");
+      }
+    }
+    else{
+      _alterDialogBuilder("Some field is missing");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,8 +100,9 @@ class _AddBudgetState extends State<AddBudget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 3),
+                  SizedBox(height: 12),
                   TextField(
+                      controller: _spendingInputCtrl,
                       style: TextStyle(color: Colors.white, fontSize: 18),
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(0, 26, 0, 26),
@@ -46,8 +113,7 @@ class _AddBudgetState extends State<AddBudget> {
                           child: Container(
                             padding: EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(14)),
+                              borderRadius: BorderRadius.all(Radius.circular(14)),
                               color: Color(0xFF8D8E90),
                             ),
                             child: Text(
@@ -74,7 +140,34 @@ class _AddBudgetState extends State<AddBudget> {
                           fontWeight: FontWeight.w700),
                     ),
                   ),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(0)),
+                        color: Color(0xFF1B1C1E)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 14, 0, 14),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.account_balance_wallet_outlined,
+                            size: 26,
+                            color: Color(0xFF8D8E90),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                            child: Text(
+                              "$walletname",
+                              style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 2),
                   TextField(
+                      controller: _transactionnameInputCtrl,
                       style: TextStyle(color: Colors.white, fontSize: 18),
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(0, 14, 0, 14),
@@ -83,11 +176,11 @@ class _AddBudgetState extends State<AddBudget> {
                             fontSize: 20,
                             fontFamily: 'RobotoSlab',
                             fontWeight: FontWeight.w700),
-                        labelText: 'Wallet name',
+                        labelText: 'Name Budget',
                         filled: true,
                         fillColor: Color(0xFF1B1C1E),
                         prefixIcon: Icon(
-                          Icons.person,
+                          Icons.help,
                           size: 26,
                           color: Color(0xFF8D8E90),
                         ),
@@ -95,149 +188,99 @@ class _AddBudgetState extends State<AddBudget> {
                           borderRadius: BorderRadius.all(Radius.circular(0)),
                         ),
                       )),
-                  SizedBox(height: 2),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(14, 14, 14, 14),
-                    decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.wallet_membership,
-                          size: 26,
-                          color: Color(0xFF8D8E90),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: Text('Wallet',
-                              style: TextStyle(
-                                  color: Color(0xFFCCCCCC),
-                                  fontSize: 20,
-                                  fontFamily: 'RobotoSlab',
-                                  fontWeight: FontWeight.w700)),
-                        ),
-                        GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SelectWallet()));
-                            },
-                            child: Icon(Icons.arrow_forward_ios,
-                                color: Color(0xFF8D8E90), size: 26))
-                      ],
-                    ),
+                  SizedBox(
+                    height: 2,
                   ),
-                  SizedBox(height: 3),
                   Container(
-                    padding: EdgeInsets.fromLTRB(14, 14, 14, 14),
-                    decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.help,
-                          size: 26,
-                          color: Color(0xFF8D8E90),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: Text('Category',
-                              style: TextStyle(
-                                  color: Color(0xFFCCCCCC),
-                                  fontSize: 20,
-                                  fontFamily: 'RobotoSlab',
-                                  fontWeight: FontWeight.w700)),
-                        ),
-                        GestureDetector(
-                            onTap: () {
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (context) => SelectCategory()));
-                            },
-                            child: Icon(Icons.arrow_forward_ios,
-                                color: Color(0xFF8D8E90), size: 26))
-                      ],
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(0)),
+                        color: Color(0xFF1B1C1E)
                     ),
-                  ),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(14, 14, 0, 14),
-                      child: Text(
-                        'Date and repeat',
-                        style: TextStyle(
-                            color: Color(0xFFCCCCCC),
-                            fontFamily: 'RobotoSlab',
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700),
-                      )),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(14, 14, 14, 14),
-                    decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.date_range,
-                          size: 26,
-                          color: Color(0xFF8D8E90),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: Text('Date',
-                              style: TextStyle(
-                                  color: Color(0xFFCCCCCC),
-                                  fontSize: 20,
-                                  fontFamily: 'RobotoSlab',
-                                  fontWeight: FontWeight.w700)),
-                        ),
-                        GestureDetector(
-                            onTap: () {},
-                            child: Icon(Icons.arrow_forward_ios,
-                                color: Color(0xFF8D8E90), size: 26))
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 14, 0, 14),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: (){
+                              _choosecategory(context);
+                            },
+                            child: Icon(
+                              Icons.category,
+                              size: 26,
+                              color: Color(0xFF8D8E90),
+                            ),
+                          ),
+                          StreamBuilder<DocumentSnapshot>(
+                              stream: FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser.uid).collection("categorys").doc(idtemptransaction).snapshots(),
+                              builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                    child: Text(
+                                      "Choose Category",
+                                      style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                                    ),
+                                  );
+                                  // return Center(child: CircularProgressIndicator());
+                                }
+                                if (snapshot.hasError) {
+                                  return Center(child: Text(snapshot.error.toString()));
+                                }
+                                if(!snapshot.data.exists){
+                                  return Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                    child: Text(
+                                      "Choose Category",
+                                      style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                                    ),
+                                  );
+                                }else{
+                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                  // colorTemp = Color(int.parse(category.color));
+                                  return Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                    child: Text(
+                                      "${category.name}",
+                                      style: TextStyle(color: Color(int.parse(category.color)), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                                    ),
+                                  );
+                                }
+                              }
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(
-                    height: 3,
+                    height: 2,
                   ),
                   Container(
-                    padding: EdgeInsets.fromLTRB(14, 14, 14, 14),
-                    decoration: BoxDecoration(color: Color(0xFF1B1C1E)),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.repeat,
-                          size: 26,
-                          color: Color(0xFF8D8E90),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: Text('Repeat',
-                              style: TextStyle(
-                                  color: Color(0xFFCCCCCC),
-                                  fontSize: 20,
-                                  fontFamily: 'RobotoSlab',
-                                  fontWeight: FontWeight.w700)),
-                        ),
-                        GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Repeat()));
-                            },
-                            child: Icon(Icons.arrow_forward_ios,
-                                color: Color(0xFF8D8E90), size: 26))
-                      ],
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(0)),
+                        color: Color(0xFF1B1C1E)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 14, 0, 14),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            child: Icon(
+                              Icons.date_range,
+                              size: 26,
+                              color: Color(0xFF8D8E90),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                            child: Text(
+                              "Day ${selectedDate.day} Month ${selectedDate.month} Year ${selectedDate.year}",
+                              style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 20,fontFamily: 'RobotoSlab', fontWeight: FontWeight.w700),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(height: 14),
                 ],
               ),
             )),
@@ -246,7 +289,7 @@ class _AddBudgetState extends State<AddBudget> {
             decoration: BoxDecoration(
                 color: Color(0xFF1B1C1E),
                 border:
-                    Border(top: BorderSide(color: Colors.white, width: 0.5))),
+                Border(top: BorderSide(color: Colors.white, width: 0.5))),
             child: OutlinedButton(
                 child: Text(
                   'Save',
@@ -256,10 +299,10 @@ class _AddBudgetState extends State<AddBudget> {
                       fontSize: 18,
                       fontWeight: FontWeight.w500),
                 ),
-                onPressed: () {},
+                onPressed: () {createTransaction();},
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(Color(0xFF303030)),
+                    MaterialStateProperty.all(Color(0xFF303030)),
                     padding: MaterialStateProperty.all(
                         EdgeInsets.fromLTRB(0, 8, 0, 8)),
                     shape: MaterialStateProperty.all(RoundedRectangleBorder(

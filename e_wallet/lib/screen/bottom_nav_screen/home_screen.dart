@@ -262,12 +262,12 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.all(Radius.circular(10.0)),
               side: BorderSide(color: Color(0xFF8D8E90))),
           title: Text(
-            "Delete wallet?",
+            "Delete transaction?",
             style: TextStyle(color: Color(0xFF8D8E90)),
           ),
           content: Container(
             child: Text(
-              "Are you sure you want to delete this wallet",
+              "Are you sure you want to delete this transaction",
               style: TextStyle(color: Color(0xFF8D8E90),fontSize: 18),
             ),
           ),
@@ -351,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               RichText(
                 text: TextSpan(
-                    text: "${formatter.format(double.parse(sp.spending))}",
+                    text: sp.classify == "0" ? "-${formatter.format(double.parse(sp.spending))}" : "+${formatter.format(double.parse(sp.spending))}",
                     style: TextStyle(
                         color: Color(0xFFF40057),
                         fontFamily: 'RobotoSlab',

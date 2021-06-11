@@ -19,7 +19,7 @@ class _DetailPlannedPaymentState extends State<DetailPlannedPayment> {
             actions: [
               GestureDetector(
                 onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => EditPlannedPayment()));
+                  // Navigator.push(context, MaterialPageRoute(builder: (context) => EditPlannedPayment()));
                 },
                 child: Icon(Icons.edit, color: Color(0xFFCC0047)))
             ],
