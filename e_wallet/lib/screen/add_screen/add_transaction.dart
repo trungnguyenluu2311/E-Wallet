@@ -1,6 +1,7 @@
 import 'package:e_wallet/models/category_model.dart';
 import 'package:e_wallet/screen/select_screen/select_category.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -90,7 +91,10 @@ class _AddTransactionState extends State<AddTransaction> {
 
   createTransaction() async {
   if(_transactionnameInputCtrl.text != "" && _spendingInputCtrl.text != ""){
-    if(_noteInputCtrl.text != "" && _image != null){
+    if(!_spendingInputCtrl.text.contains(RegExp('[0-9]'))){
+      _alterDialogBuilder("Transaction money must be a number");
+    }
+    else if(_noteInputCtrl.text != "" && _image != null){
       // print("test1");
       Reference ref = _firestorage.ref().child(Path.basename(_image.path));
       UploadTask uploadTask = ref.putFile(_image);
@@ -255,6 +259,8 @@ class _AddTransactionState extends State<AddTransaction> {
                     height: 12,
                   ),
                   TextField(
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]+')),],
                     controller: _spendingInputCtrl,
                     style: TextStyle(color: Colors.white, fontSize: 18),
                     decoration: InputDecoration(

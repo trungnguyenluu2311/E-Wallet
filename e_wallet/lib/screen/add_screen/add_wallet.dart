@@ -2,6 +2,7 @@ import 'package:e_wallet/screen/select_screen/select_currency.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 
 class AddWallet extends StatefulWidget {
   @override
@@ -113,6 +114,8 @@ class _AddWalletState extends State<AddWallet> {
                   )),
                 SizedBox(height: 2),
                 TextField(
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]+')),],
                   controller: _balancesInputCtrl,
                   style: TextStyle(color: Colors.white, fontSize: 18),
                   decoration: InputDecoration(

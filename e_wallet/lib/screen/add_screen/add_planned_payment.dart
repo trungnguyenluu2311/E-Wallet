@@ -4,6 +4,7 @@ import 'package:e_wallet/screen/select_screen/select_category.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 
 class AddPlannedPayment extends StatefulWidget {
   final String idwallet;
@@ -176,6 +177,8 @@ class _AddPlannedPaymentState extends State<AddPlannedPayment> {
                     height: 12,
                   ),
                   TextField(
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]+')),],
                       controller: _spendingInputCtrl,
                       style: TextStyle(color: Colors.white, fontSize: 18),
                       decoration: InputDecoration(

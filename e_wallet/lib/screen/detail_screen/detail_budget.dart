@@ -122,7 +122,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                                         QuerySnapshot query = snapshot.data;
                                         if(query.size == 0){
                                           return Text(
-                                          "${budgetModel.spending}",
+                                            "${formatter.format(double.parse(budgetModel.spending))} VNĐ",
                                           style: TextStyle(
                                           color: Color(0xFF999999),
                                           fontSize: 16,
