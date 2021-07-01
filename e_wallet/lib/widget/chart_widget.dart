@@ -1,7 +1,6 @@
-import 'package:e_wallet/models/chart_column.dart';
-import 'package:e_wallet/widget/contans.dart';
-import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:e_wallet/models/chart_column.dart';
+import 'package:flutter/material.dart';
 
 class ChartWidget extends StatelessWidget {
   List<ChartColumn>  datathu;
