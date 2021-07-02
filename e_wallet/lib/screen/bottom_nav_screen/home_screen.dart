@@ -226,8 +226,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text("You don't have any transaction yet",style: TextStyle(
-                                    color: Colors.white,
-                                  ),),
+                                      fontFamily: 'RobotoSlab',
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 18,
+                                      color: Color(0xFF787878)),),
                                 ],
                               )
                           );

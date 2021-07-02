@@ -41,9 +41,9 @@ class _AddTransactionState extends State<AddTransaction> {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        print(_image);
+        // print(_image);
       } else {
-        print('No image selected.');
+        // print('No image selected.');
       }
     });
   }
