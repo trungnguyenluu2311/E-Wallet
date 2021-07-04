@@ -177,7 +177,15 @@ class _StatisticScreenState extends State<StatisticScreen> {
             .snapshots(),
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              padding: EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.black,
+              ),
+              child: Center(child: CircularProgressIndicator()),
+            );
           }
           if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()));
@@ -188,7 +196,15 @@ class _StatisticScreenState extends State<StatisticScreen> {
             stream: FirebaseFirestore.instance.collection("users").doc(user.id).collection("wallets").doc(user.idwallet).snapshots(),
             builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  padding: EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                  ),
+                  child: Center(child: CircularProgressIndicator()),
+                );
               }
               if (snapshot.hasError) {
                 return Center(child: Text(snapshot.error.toString()));
@@ -225,7 +241,15 @@ class _StatisticScreenState extends State<StatisticScreen> {
                         .snapshots(),
                     builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height,
+                          padding: EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                          ),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
                       }
                       if (snapshot.hasError) {
                         return Center(child: Text(snapshot.error.toString()));
