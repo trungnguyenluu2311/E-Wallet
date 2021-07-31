@@ -1,7 +1,11 @@
+import 'package:e_wallet/models/user_model.dart';
 import 'package:e_wallet/screen/signin_signup_screen/create_account.dart';
 import 'package:e_wallet/widget/custom_input.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -48,6 +52,88 @@ class _LoginScreenState extends State<LoginScreen> {
       return e.message;
     } catch (e) {
       return e.toString();
+    }
+  }
+
+  Future<String> googleSignIn() async {
+    try {
+      GoogleSignInAccount googleSignInAccount = await GoogleSignIn().signIn();
+      GoogleSignInAuthentication googleAuth =
+      await googleSignInAccount.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential user = await FirebaseAuth.instance.signInWithCredential(credential);
+      await FirebaseFirestore.instance.collection("users").doc(user.user.uid).get().then((value) async {
+        if(!value.exists){
+          UserModel users = UserModel(
+            id: user.user.uid,
+            email: user.user.email,
+            name: user.user.displayName,
+            idwallet: "nonewallet",
+          );
+          await FirebaseFirestore.instance.collection("users").doc(users.id).set({
+            "id": users.id,
+            "name": users.name,
+            "email": users.email,
+            "idwallet": users.idwallet,
+          });
+        }
+        else{
+          print("user name: ${user.user.displayName}");
+          print("user name: ${user.user.uid}");
+        }
+      });
+    } catch (error) {
+      return error;
+    }
+  }
+
+  Future<bool> isNewUser(UserCredential user) async {
+    print("user name: ${user.user.uid}");
+    QuerySnapshot result = await FirebaseFirestore.instance
+        .collection("users")
+        .where("email", isEqualTo: user.user.email)
+        .get();
+    final List<DocumentSnapshot> docs = result.docs;
+    return docs.length == 0 ? true : false;
+  }
+
+  Future<void> addUserToDb(UserCredential user) async {
+    UserModel users = UserModel(
+      id: user.user.uid,
+      email: user.user.email,
+      name: user.user.displayName,
+      idwallet: "nonewallet",
+    );
+    await FirebaseFirestore.instance.collection("users").doc(users.id).set({
+      "id": users.id,
+      "name": users.name,
+      "email": users.email,
+      "idwallet": users.idwallet,
+    });
+  }
+
+  void _submitGoogle() async {
+    // Set the form to loading state
+    setState(() {
+      _loginFormLoading = true;
+    });
+
+    // Run the create account method
+    String _loginFeedback = await googleSignIn();
+
+    // If the string is not null, we got error while create account.
+    if(_loginFeedback != null) {
+      _alertDialogBuilder(_loginFeedback);
+
+      // Set the form to regular state [not loading].
+      setState(() {
+        _loginFormLoading = false;
+      });
     }
   }
 
@@ -175,7 +261,28 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
                         )),
-              ]),
+                      ]),
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    height: 80,
+                    width: MediaQuery.of(context).size.width * 0.9 ,
+                    child: OutlineButton.icon(
+                      label: Text(
+                        'Sign In With Google',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                      ),
+                      shape: StadiumBorder(),
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      highlightedBorderColor: Colors.white,
+                      borderSide: BorderSide(color: Colors.white),
+                      textColor: Color(0xFFCC0047),
+                      icon: FaIcon(FontAwesomeIcons.google, color: Color(0xFFCC0047)),
+                      onPressed: () {
+                        _submitGoogle();
+                      },
+                    ),
+                  ),
               SizedBox(height: 66),
               GestureDetector(
                 onTap: (){

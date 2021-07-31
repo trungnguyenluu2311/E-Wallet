@@ -43,6 +43,8 @@ dev_dependencies:
   flutter_colorpicker: ^0.4.0
   intl:
   image_picker:
+  google_sign_in: ^4.0.1+1
+  font_awesome_flutter:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
