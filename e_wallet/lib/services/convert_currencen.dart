@@ -10,7 +10,7 @@ class ConvertRepo{
 
   ConvertRepo._internal();
 
-  Future<double> convert({String fromCurr, String toCurr, double value}) async{
+  Future<double> convert({required String fromCurr, required String toCurr, required double value}) async{
     final response = await http.get(
         'https://free.currconv.com/api/v7/convert?q=${fromCurr}_${toCurr}&compact=ultra&apiKey=6fbb855fe3e53b9762e2'
     );

@@ -29,12 +29,12 @@ class _AddPlannedPaymentState extends State<AddPlannedPayment> {
   DateTime selectedDate = DateTime.now();
 
   _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime picked = (await showDatePicker(
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2050),
-    );
+    ))!;
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
@@ -303,7 +303,7 @@ class _AddPlannedPaymentState extends State<AddPlannedPayment> {
                                 if (snapshot.hasError) {
                                   return Center(child: Text(snapshot.error.toString()));
                                 }
-                                if(!snapshot.data.exists){
+                                if(!snapshot.data!.exists){
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                     child: Text(
@@ -312,7 +312,7 @@ class _AddPlannedPaymentState extends State<AddPlannedPayment> {
                                     ),
                                   );
                                 }else{
-                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
                                   // colorTemp = Color(int.parse(category.color));
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),

@@ -2,29 +2,29 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class SpendingModel {
-  String id;
-  String name;
-  String walletname;
-  String spending;
-  DateTime datespend;
-  String note;
-  String photo;
-  String classify;
-  String idcategory;
+  late String id;
+  late String name;
+  late String walletname;
+  late String spending;
+  late DateTime datespend;
+  late String note;
+  late String photo;
+  late String classify;
+  late String idcategory;
 
   SpendingModel({
-    this.id,
-    this.name,
-    this.walletname,
-    this.spending,
-    this.datespend,
-    this.note,
-    this.photo,
-    this.classify,
-    this.idcategory,
+    required this.id,
+    required this.name,
+    required this.walletname,
+    required this.spending,
+    required this.datespend,
+    required this.note,
+    required this.photo,
+    required this.classify,
+    required this.idcategory,
   });
 
-  SpendingModel.fromDocumentSnapshot({DocumentSnapshot documentSnapshot}) {
+  SpendingModel.fromDocumentSnapshot({required DocumentSnapshot documentSnapshot}) {
     id = documentSnapshot.id;
     name = documentSnapshot["name"];
     walletname = documentSnapshot["walletname"];
@@ -37,7 +37,7 @@ class SpendingModel {
     idcategory = documentSnapshot["idcategory"];
   }
 
-  SpendingModel.fromQueryDocumentSnapshot({QueryDocumentSnapshot queryDocSnapshot}) {
+  SpendingModel.fromQueryDocumentSnapshot({required QueryDocumentSnapshot queryDocSnapshot}) {
     var data = queryDocSnapshot.data();
     id = queryDocSnapshot.id;
     name = data["name"];

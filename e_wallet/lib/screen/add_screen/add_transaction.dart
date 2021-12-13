@@ -28,7 +28,7 @@ class _AddTransactionState extends State<AddTransaction> {
   final TextEditingController _spendingInputCtrl = TextEditingController();
   final TextEditingController _noteInputCtrl = TextEditingController();
   String idtemptransaction = "nonecategory";
-  File _image;
+  File? _image;
 
   DateTime selectedDate = DateTime.now();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -49,12 +49,12 @@ class _AddTransactionState extends State<AddTransaction> {
   }
 
   _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime picked = (await showDatePicker(
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2050),
-    );
+    ))!;
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
@@ -96,7 +96,7 @@ class _AddTransactionState extends State<AddTransaction> {
     }
     else if(_noteInputCtrl.text != "" && _image != null){
       // print("test1");
-      Reference ref = _firestorage.ref().child(Path.basename(_image.path));
+      Reference ref = _firestorage.ref().child(Path.basename(_image!.path));
       UploadTask uploadTask = ref.putFile(_image);
       uploadTask.then((res) {
         res.ref.getDownloadURL().then((fileURL) async {
@@ -131,7 +131,7 @@ class _AddTransactionState extends State<AddTransaction> {
       }
       else if(_noteInputCtrl.text == "" && _image != null){
         // print("test2");
-        Reference ref = _firestorage.ref().child(Path.basename(_image.path));
+        Reference ref = _firestorage.ref().child(Path.basename(_image!.path));
         UploadTask uploadTask = ref.putFile(_image);
         uploadTask.then((res) {
           res.ref.getDownloadURL().then((fileURL) async {
@@ -385,7 +385,7 @@ class _AddTransactionState extends State<AddTransaction> {
                               if (snapshot.hasError) {
                                 return Center(child: Text(snapshot.error.toString()));
                               }
-                              if(!snapshot.data.exists){
+                              if(!snapshot.data!.exists){
                                 return Padding(
                                   padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                   child: Text(
@@ -394,7 +394,7 @@ class _AddTransactionState extends State<AddTransaction> {
                                   ),
                                 );
                               }else{
-                                final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
                                 // colorTemp = Color(int.parse(category.color));
                                 return Padding(
                                   padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -509,7 +509,7 @@ class _AddTransactionState extends State<AddTransaction> {
                   Center(
                     child: _image == null
                         ? Text("No image selected.")
-                        : Image.file(_image),
+                        : Image.file(_image!),
                   ),
                 ],
               ),

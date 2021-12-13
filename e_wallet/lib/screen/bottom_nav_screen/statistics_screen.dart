@@ -16,7 +16,7 @@ class StatisticScreen extends StatefulWidget {
 
 class _StatisticScreenState extends State<StatisticScreen> {
   final formatter = new NumberFormat("#,###");
-  SpendingModel sp;
+  late SpendingModel sp;
   double tongthu1 = 0;
   double tongthu2 = 0;
   double tongthu3 = 0;
@@ -191,7 +191,7 @@ class _StatisticScreenState extends State<StatisticScreen> {
             return Center(child: Text(snapshot.error.toString()));
           }
           final UserModel user =
-              UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+              UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
           return StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance.collection("users").doc(user.id).collection("wallets").doc(user.idwallet).snapshots(),
             builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -209,7 +209,7 @@ class _StatisticScreenState extends State<StatisticScreen> {
               if (snapshot.hasError) {
                 return Center(child: Text(snapshot.error.toString()));
               }
-              DocumentSnapshot document = snapshot.data;
+              DocumentSnapshot document = snapshot.data!;
               if(!document.exists){
                 return Container(
                   width: MediaQuery.of(context).size.width,
@@ -254,7 +254,7 @@ class _StatisticScreenState extends State<StatisticScreen> {
                       if (snapshot.hasError) {
                         return Center(child: Text(snapshot.error.toString()));
                       }
-                      QuerySnapshot query = snapshot.data;
+                      QuerySnapshot query = snapshot.data!;
                       if (query.size == 0) {
                         return Container(
                           width: MediaQuery.of(context).size.width,
@@ -401,7 +401,7 @@ class _StatisticScreenState extends State<StatisticScreen> {
                                         if (snapshot.hasError) {
                                           return Center(child: Text(snapshot.error.toString()));
                                         }
-                                        DocumentSnapshot document = snapshot.data;
+                                        DocumentSnapshot document = snapshot.data!;
                                         if(!document.exists){
                                           return Container(
                                             padding: EdgeInsets.all(18),
@@ -420,7 +420,7 @@ class _StatisticScreenState extends State<StatisticScreen> {
                                           );
                                         }
                                         else{
-                                          final WalletModel wallet = WalletModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                          final WalletModel wallet = WalletModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
                                           return Container(
                                             padding: EdgeInsets.all(8),
                                             decoration: BoxDecoration(
@@ -438,7 +438,7 @@ class _StatisticScreenState extends State<StatisticScreen> {
                                                         if (snapshot.hasError) {
                                                           return Center(child: Text(snapshot.error.toString()));
                                                         }
-                                                        QuerySnapshot query = snapshot.data;
+                                                        QuerySnapshot query = snapshot.data!;
                                                         if(query.size == 0){
                                                           return Center(
                                                             child: RichText(

@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:e_wallet/screen/landing_page.dart';
 import 'package:flutter/material.dart';
 

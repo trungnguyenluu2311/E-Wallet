@@ -26,6 +26,8 @@ class _AddBudgetState extends State<AddBudget> {
 
   DateTime selectedDate = DateTime.now();
 
+  get documentSnapshot => null;
+
 
   Future<void> _alterDialogBuilder(String error) async {
     return showDialog(
@@ -229,7 +231,7 @@ class _AddBudgetState extends State<AddBudget> {
                                 if (snapshot.hasError) {
                                   return Center(child: Text(snapshot.error.toString()));
                                 }
-                                if(!snapshot.data.exists){
+                                if(!snapshot.data!.exists){
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                     child: Text(
@@ -238,7 +240,7 @@ class _AddBudgetState extends State<AddBudget> {
                                     ),
                                   );
                                 }else{
-                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
                                   // colorTemp = Color(int.parse(category.color));
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),

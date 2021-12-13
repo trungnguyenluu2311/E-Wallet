@@ -105,7 +105,7 @@ class _SelectCategoryState extends State<SelectCategory> {
                         if (snapshot.hasError) {
                           return Center(child: Text(snapshot.error.toString()));
                         }
-                        QuerySnapshot query = snapshot.data;
+                        QuerySnapshot query = snapshot.data!;
                         if(query.size == 0){
                           return Center(
                               child: Column(

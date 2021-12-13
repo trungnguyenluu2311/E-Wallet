@@ -27,7 +27,7 @@ class _EditTransactionState extends State<EditTransaction> {
   final TextEditingController _transactionnameInputCtrl = TextEditingController();
   final TextEditingController _spendingInputCtrl = TextEditingController();
   final TextEditingController _noteInputCtrl = TextEditingController();
-  File _image;
+  File? _image;
   String idtemptransaction = "nonecategory";
   DateTime selectedDate = DateTime.now();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -48,12 +48,12 @@ class _EditTransactionState extends State<EditTransaction> {
   }
 
   _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime picked = (await showDatePicker(
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2050),
-    );
+    ))!;
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
@@ -88,7 +88,7 @@ class _EditTransactionState extends State<EditTransaction> {
           var photo = _firestorage.refFromURL(spendingModel.photo);
           await photo.delete();
         }
-        Reference ref = _firestorage.ref().child(Path.basename(_image.path));
+        Reference ref = _firestorage.ref().child(Path.basename(_image!.path));
         UploadTask uploadTask = ref.putFile(_image);
         uploadTask.then((res) {
           res.ref.getDownloadURL().then((fileURL) async {
@@ -356,7 +356,7 @@ class _EditTransactionState extends State<EditTransaction> {
                                 if (snapshot.hasError) {
                                   return Center(child: Text(snapshot.error.toString()));
                                 }
-                                if(!snapshot.data.exists){
+                                if(!snapshot.data!.exists){
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                     child: Text(
@@ -365,7 +365,7 @@ class _EditTransactionState extends State<EditTransaction> {
                                     ),
                                   );
                                 }else{
-                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
                                   // colorTemp = Color(int.parse(category.color));
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -481,11 +481,11 @@ class _EditTransactionState extends State<EditTransaction> {
                   Center(
                     child: _image == null
                         ? Text("No image selected.")
-                        : Image.file(_image, fit: BoxFit.fill))
+                        : Image.file(_image!, fit: BoxFit.fill))
                   : Center(
                   child: _image == null
                       ? Image.network("${spendingModel.photo}", fit: BoxFit.fill)
-                      : Image.file(_image, fit: BoxFit.fill),
+                      : Image.file(_image!, fit: BoxFit.fill),
                   ),
                 ],
               ),

@@ -32,12 +32,12 @@ class _EditPlannedPaymentState extends State<EditPlannedPayment> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime picked = (await showDatePicker(
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2050),
-    );
+    ))!;
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
@@ -315,7 +315,7 @@ class _EditPlannedPaymentState extends State<EditPlannedPayment> {
                                 if (snapshot.hasError) {
                                   return Center(child: Text(snapshot.error.toString()));
                                 }
-                                if(!snapshot.data.exists){
+                                if(!snapshot.data!.exists){
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                     child: Text(
@@ -324,7 +324,7 @@ class _EditPlannedPaymentState extends State<EditPlannedPayment> {
                                     ),
                                   );
                                 }else{
-                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
                                   // colorTemp = Color(int.parse(category.color));
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),

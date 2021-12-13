@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()));
           }
-          final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+          final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
             return SingleChildScrollView(
               child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               if (snapshot.hasError) {
                                 return Center(child: Text(snapshot.error.toString()));
                               }
-                              DocumentSnapshot document = snapshot.data;
+                              DocumentSnapshot document = snapshot.data!;
                               if(!document.exists){
                                 return Container(
                                   padding: EdgeInsets.all(18),
@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 );
                               }
                               else{
-                                final WalletModel wallet = WalletModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                final WalletModel wallet = WalletModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
                                 return GestureDetector(
                                   onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditWallet(wallet)));},
                                   child: Container(
@@ -109,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               if (snapshot.hasError) {
                                                 return Center(child: Text(snapshot.error.toString()));
                                               }
-                                              QuerySnapshot query = snapshot.data;
+                                              QuerySnapshot query = snapshot.data!;
                                               if(query.size == 0){
                                                 return RichText(
                                                   text: TextSpan(
@@ -219,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (snapshot.hasError) {
                           return Center(child: Text(snapshot.error.toString()));
                         }
-                        QuerySnapshot query = snapshot.data;
+                        QuerySnapshot query = snapshot.data!;
                         if(query.size == 0){
                           return Center(
                               child: Column(

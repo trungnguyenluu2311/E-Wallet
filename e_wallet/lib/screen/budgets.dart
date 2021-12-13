@@ -53,7 +53,7 @@ class _BudgetsState extends State<Budgets> {
                 if (snapshot.hasError) {
                   return Center(child: Text(snapshot.error.toString()));
                 }
-                QuerySnapshot query = snapshot.data;
+                QuerySnapshot query = snapshot.data!;
                 if(query.size == 0){
                   return Center(
                       child: Column(
@@ -90,7 +90,7 @@ class _BudgetsState extends State<Budgets> {
               if (snapshot.hasError) {
                 return Center(child: Text(snapshot.error.toString()));
               }
-              final WalletModel walletModel = WalletModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+              final WalletModel walletModel = WalletModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
               return FloatingActionButton(
                   onPressed: () {
                     Navigator.push(context,
@@ -175,7 +175,7 @@ class _BudgetsState extends State<Budgets> {
               if (snapshot.hasError) {
                 return Center(child: Text(snapshot.error.toString()));
               }
-              CategoryModel ct = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+              CategoryModel ct = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
               return Column(
                 children: [
                   Row(
@@ -205,7 +205,7 @@ class _BudgetsState extends State<Budgets> {
                             if (snapshot.hasError) {
                               return Center(child: Text(snapshot.error.toString()));
                             }
-                            QuerySnapshot query = snapshot.data;
+                            QuerySnapshot query = snapshot.data!;
                             if(query.size == 0){
                               return Text(
                                 "${formatter.format(double.parse(sp.spending))} VNĐ",

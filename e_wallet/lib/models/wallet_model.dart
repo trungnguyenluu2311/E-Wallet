@@ -1,21 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class WalletModel {
-  String id;
-  String name;
-  String balances;
-  DateTime datecreated;
+  late String id;
+  late String name;
+  late String balances;
+  late DateTime datecreated;
   // String currency;
 
   WalletModel({
-    this.id,
-    this.name,
-    this.balances,
-    this.datecreated,
+    required this.id,
+    required this.name,
+    required this.balances,
+    required this.datecreated,
     // this.currency,
   });
 
-  WalletModel.fromDocumentSnapshot({DocumentSnapshot documentSnapshot}) {
+  WalletModel.fromDocumentSnapshot({required DocumentSnapshot documentSnapshot}) {
     id = documentSnapshot.id;
     name = documentSnapshot["name"];
     balances = documentSnapshot["balances"];
@@ -23,7 +23,7 @@ class WalletModel {
     // currency = documentSnapshot["currency"];
   }
 
-  WalletModel.fromQueryDocumentSnapshot({QueryDocumentSnapshot queryDocSnapshot}) {
+  WalletModel.fromQueryDocumentSnapshot({required QueryDocumentSnapshot queryDocSnapshot}) {
     var data = queryDocSnapshot.data();
     id = queryDocSnapshot.id;
     name = data["name"];

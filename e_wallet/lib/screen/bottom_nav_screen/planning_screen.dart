@@ -45,7 +45,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
         if (snapshot.hasError) {
           return Center(child: Text(snapshot.error.toString()));
         }
-        final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+        final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
         if(user.idwallet =="nonewallet"){
           return  Container(
             padding: EdgeInsets.fromLTRB(14, 24, 14, 0),

@@ -7,7 +7,7 @@ class ChartWidget extends StatelessWidget {
   List<ChartColumn>  datachi;
 
   ChartWidget({
-   this.datathu,this.datachi
+   required this.datathu,required this.datachi
   });
   @override
   Widget build(BuildContext context) {

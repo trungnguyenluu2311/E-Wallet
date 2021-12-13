@@ -253,7 +253,7 @@ class _EditBudgetState extends State<EditBudget> {
                                 if (snapshot.hasError) {
                                   return Center(child: Text(snapshot.error.toString()));
                                 }
-                                if(!snapshot.data.exists){
+                                if(!snapshot.data!.exists){
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                     child: Text(
@@ -262,7 +262,7 @@ class _EditBudgetState extends State<EditBudget> {
                                     ),
                                   );
                                 }else{
-                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                                  final category = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
                                   // colorTemp = Color(int.parse(category.color));
                                   return Padding(
                                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),

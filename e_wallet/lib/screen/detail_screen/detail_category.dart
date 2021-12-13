@@ -16,7 +16,7 @@ class _DetailCategoryState extends State<DetailCategory> {
   final CategoryModel category;
   _DetailCategoryState(this.category);
 
-  Color currentColor;
+  Color? currentColor;
 
   void _showDialog(String idcategory) {
     showDialog(

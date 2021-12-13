@@ -45,7 +45,7 @@ class _ProfileState extends State<Profile> {
           if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()));
           }
-          final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+          final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
             return Scaffold(
               appBar: AppBar(
                 actions: [

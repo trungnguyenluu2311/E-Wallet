@@ -2,29 +2,29 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class PlannedModel {
-  String id;
-  String name;
-  String walletname;
-  String spending;
-  DateTime datespend;
-  String note;
-  String classify;
-  String idcategory;
-  String confirmation;
+  late String id;
+  late String name;
+  late String walletname;
+  late String spending;
+  late DateTime datespend;
+  late String note;
+  late String classify;
+  late String idcategory;
+  late String confirmation;
 
   PlannedModel({
-    this.id,
-    this.name,
-    this.walletname,
-    this.spending,
-    this.datespend,
-    this.note,
-    this.classify,
-    this.idcategory,
-    this.confirmation
+    required this.id,
+    required this.name,
+    required this.walletname,
+    required this.spending,
+    required this.datespend,
+    required this.note,
+    required this.classify,
+    required this.idcategory,
+    required this.confirmation
   });
 
-  PlannedModel.fromDocumentSnapshot({DocumentSnapshot documentSnapshot}) {
+  PlannedModel.fromDocumentSnapshot({required DocumentSnapshot documentSnapshot}) {
     id = documentSnapshot.id;
     name = documentSnapshot["name"];
     walletname = documentSnapshot["walletname"];
@@ -37,7 +37,7 @@ class PlannedModel {
     confirmation = documentSnapshot["confirmation"];
   }
 
-  PlannedModel.fromQueryDocumentSnapshot({QueryDocumentSnapshot queryDocSnapshot}) {
+  PlannedModel.fromQueryDocumentSnapshot({required QueryDocumentSnapshot queryDocSnapshot}) {
     var data = queryDocSnapshot.data();
     id = queryDocSnapshot.id;
     name = data["name"];

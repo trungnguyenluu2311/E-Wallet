@@ -119,7 +119,7 @@ class _MainScreenState extends State<MainScreen> {
             if (snapshot.hasError) {
               return Center(child: Text(snapshot.error.toString()));
             }
-            final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+            final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
             if(user.idwallet =="nonewallet"){
               return FloatingActionButton(
                   heroTag: Text("btnaddspending"),
@@ -138,7 +138,7 @@ class _MainScreenState extends State<MainScreen> {
                   if (snapshot.hasError) {
                     return Center(child: Text(snapshot.error.toString()));
                   }
-                  final WalletModel wallet = WalletModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                  final WalletModel wallet = WalletModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
                   return FloatingActionButton(
                       heroTag: Text("btnaddspending"),
                       onPressed: () {

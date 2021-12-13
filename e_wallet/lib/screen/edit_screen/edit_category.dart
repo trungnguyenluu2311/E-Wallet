@@ -15,7 +15,7 @@ class _EditCategoryState extends State<EditCategory> {
   final CategoryModel category;
   _EditCategoryState(this.category);
 
-  Color currentColor;
+  Color? currentColor;
   void changeColor(Color color) => setState(() => currentColor = color);
   final TextEditingController _categorynameInputCtrl = TextEditingController();
   final TextEditingController _noteInputCtrl = TextEditingController();
@@ -26,7 +26,7 @@ class _EditCategoryState extends State<EditCategory> {
       await docRef.update({
         "name": _categorynameInputCtrl.text.trim(),
         "note": _noteInputCtrl.text.trim(),
-        "color": currentColor.value.toString(),
+        "color": currentColor!.value.toString(),
       });
       Navigator.pop(context);
       Navigator.pop(context);
@@ -108,7 +108,7 @@ class _EditCategoryState extends State<EditCategory> {
                                     side: BorderSide(color: Color(0xFFCCCCCC))),
                                 content: SingleChildScrollView(
                                   child: BlockPicker(
-                                    pickerColor: currentColor,
+                                    pickerColor: currentColor!,
                                     onColorChanged: changeColor,
                                   ),
                                 ),

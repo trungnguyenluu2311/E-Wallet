@@ -1,24 +1,25 @@
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class BudgetModel {
-  String id;
-  String name;
-  String walletname;
-  String spending;
-  DateTime datespend;
-  String idcategory;
+  late String id;
+  late String name;
+  late String walletname;
+  late String spending;
+  late DateTime datespend;
+  late String idcategory;
 
   BudgetModel({
-    this.id,
-    this.name,
-    this.walletname,
-    this.spending,
-    this.datespend,
-    this.idcategory,
+    required this.id,
+    required this.name,
+    required this.walletname,
+    required this.spending,
+    required this.datespend,
+    required this.idcategory,
   });
 
-  BudgetModel.fromDocumentSnapshot({DocumentSnapshot documentSnapshot}) {
+  BudgetModel.fromDocumentSnapshot({required DocumentSnapshot documentSnapshot}) {
     id = documentSnapshot.id;
     name = documentSnapshot["name"];
     walletname = documentSnapshot["walletname"];
@@ -28,7 +29,7 @@ class BudgetModel {
     idcategory = documentSnapshot["idcategory"];
   }
 
-  BudgetModel.fromQueryDocumentSnapshot({QueryDocumentSnapshot queryDocSnapshot}) {
+  BudgetModel.fromQueryDocumentSnapshot({required QueryDocumentSnapshot queryDocSnapshot}) {
     var data = queryDocSnapshot.data();
     id = queryDocSnapshot.id;
     name = data["name"];

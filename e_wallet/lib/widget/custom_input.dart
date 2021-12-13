@@ -10,11 +10,11 @@ class CustomInput extends StatelessWidget {
   final TextInputAction textInputAction;
   final bool isPasswordField;
 
-  CustomInput({this.hintText,this.onChange,this.onSubmitted,this.focusNode,this.textInputAction,this.isPasswordField});
+  CustomInput({required this.hintText,required this.onChange,required this.onSubmitted,required this.focusNode,required this.textInputAction,required this.isPasswordField});
 
   @override
   Widget build(BuildContext context) {
-    bool _isPasswordField = isPasswordField ?? false;
+    bool _isPasswordField = isPasswordField;
 
     return Container(
       margin: EdgeInsets.symmetric(
@@ -38,7 +38,7 @@ class CustomInput extends StatelessWidget {
               fontSize: 20,
               fontFamily: 'RobotoSlab',
               fontWeight: FontWeight.w700),
-          labelText: hintText ?? "Hint Text",
+          labelText: hintText,
           filled: true,
           fillColor: Color(0xFF730028),
           prefixIcon: Icon(

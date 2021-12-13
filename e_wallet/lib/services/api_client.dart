@@ -2,7 +2,7 @@ class Country{
   String name;
   String urlFlag;
   String currencey;
-  Country({this.name,this.currencey,this.urlFlag});
+  Country({required this.name,required this.currencey,required this.urlFlag});
 }
 
 final List<Country> datas=[

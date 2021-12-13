@@ -34,7 +34,7 @@ class _DetailBudgetState extends State<DetailBudget> {
             if (snapshot.hasError) {
               return Center(child: Text(snapshot.error.toString()));
             }
-            final BudgetModel budgetModel = BudgetModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+            final BudgetModel budgetModel = BudgetModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
             return Scaffold(
               appBar: AppBar(
                   leading: BackButton(color: Color(0xFFCC0047)),
@@ -82,7 +82,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                               if (snapshot.hasError) {
                                 return Center(child: Text(snapshot.error.toString()));
                               }
-                              CategoryModel ct = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+                              CategoryModel ct = CategoryModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
                               return Container(
                                 padding: EdgeInsets.fromLTRB(0, 14, 0, 14),
                                 width: MediaQuery.of(context).size.width,
@@ -119,7 +119,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                                         if (snapshot.hasError) {
                                           return Center(child: Text(snapshot.error.toString()));
                                         }
-                                        QuerySnapshot query = snapshot.data;
+                                        QuerySnapshot query = snapshot.data!;
                                         if(query.size == 0){
                                           return Text(
                                             "${formatter.format(double.parse(budgetModel.spending))} VNĐ",
@@ -181,7 +181,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                               if (snapshot.hasError) {
                                 return Center(child: Text(snapshot.error.toString()));
                               }
-                              QuerySnapshot query = snapshot.data;
+                              QuerySnapshot query = snapshot.data!;
                               if(query.size == 0){
                                 return Center(
                                     child: Column(

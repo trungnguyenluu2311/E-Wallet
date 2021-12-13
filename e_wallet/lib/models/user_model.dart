@@ -1,26 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModel {
-  String id;
-  String name;
-  String email;
-  String idwallet;
+  late String id;
+  late String name;
+  late String email;
+  late String idwallet;
 
   UserModel({
-    this.id,
-    this.email,
-    this.name,
-    this.idwallet,
+    required this.id,
+    required this.email,
+    required this.name,
+    required this.idwallet,
   });
 
-  UserModel.fromDocumentSnapshot({DocumentSnapshot documentSnapshot}) {
+  UserModel.fromDocumentSnapshot({required DocumentSnapshot documentSnapshot}) {
     id = documentSnapshot.id;
     name = documentSnapshot["name"];
     email = documentSnapshot["email"];
     idwallet = documentSnapshot["idwallet"];
   }
 
-  UserModel.fromQueryDocumentSnapshot({QueryDocumentSnapshot queryDocSnapshot}) {
+  UserModel.fromQueryDocumentSnapshot({required QueryDocumentSnapshot queryDocSnapshot}) {
     var data = queryDocSnapshot.data();
     id = queryDocSnapshot.id;
     name = data["name"];

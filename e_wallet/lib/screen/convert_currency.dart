@@ -13,7 +13,7 @@ class _ConvertCurrencyState extends State<ConvertCurrency> {
   Country fromCountry = datas[0];
   Country toCountry = datas[1];
   double value = 1;
-  Future<double> resFuture;
+  late Future<double> resFuture;
 
   @override
   void initState() {
@@ -119,7 +119,7 @@ class _ConvertCurrencyState extends State<ConvertCurrency> {
                           future: resFuture,
                           builder: (context, snapshot) {
                             if(snapshot.hasData){
-                              return _buildCurrencyView(toCountry, true,res:snapshot.data);
+                              return _buildCurrencyView(toCountry, true,res:snapshot.data!);
                             }
                             return SizedBox.shrink();
                           }
@@ -131,7 +131,7 @@ class _ConvertCurrencyState extends State<ConvertCurrency> {
     );
   }
 
-  Container _buildCurrencyView(Country country,bool isDestination, {double res}) {
+  Container _buildCurrencyView(Country country,bool isDestination, {double? res}) {
     return Container(
       height: 140,
       decoration: BoxDecoration(
@@ -242,8 +242,8 @@ class _ConvertCurrencyState extends State<ConvertCurrency> {
     ));
   }
 
-  List<Widget> _buildListActions({Function(int) onPressed}){
-    var listAction = List<Widget>();
+  List<Widget> _buildListActions({required Function(int) onPressed}){
+    var listAction = List<Widget>.empty(growable: true);
     for(var i=0; i<datas.length;i++)
     {
       listAction.add(CupertinoActionSheetAction(onPressed: ()=>onPressed(i), child: Text(datas[i].name)));

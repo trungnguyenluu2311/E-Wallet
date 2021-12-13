@@ -1,26 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CategoryModel {
-  String id;
-  String name;
-  String color;
-  String note;
+  late String id;
+  late String name;
+  late String color;
+  late String note;
 
   CategoryModel({
-    this.id,
-    this.name,
-    this.color,
-    this.note,
+    required this.id,
+    required this.name,
+    required this.color,
+    required this.note,
   });
 
-  CategoryModel.fromDocumentSnapshot({DocumentSnapshot documentSnapshot}) {
+  CategoryModel.fromDocumentSnapshot({required DocumentSnapshot documentSnapshot}) {
     id = documentSnapshot.id;
     name = documentSnapshot["name"];
     color = documentSnapshot["color"];
     note = documentSnapshot["note"];
   }
 
-  CategoryModel.fromQueryDocumentSnapshot({QueryDocumentSnapshot queryDocSnapshot}) {
+  CategoryModel.fromQueryDocumentSnapshot({required QueryDocumentSnapshot queryDocSnapshot}) {
     var data = queryDocSnapshot.data();
     id = queryDocSnapshot.id;
     name = data["name"];

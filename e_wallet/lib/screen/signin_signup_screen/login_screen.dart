@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _loginEmail, password: _loginPassword);
-      return null;
+      return "success";
     } on FirebaseAuthException catch(e) {
       if (e.code == 'weak-password') {
         return 'The password provided is too weak.';
@@ -87,34 +87,10 @@ class _LoginScreenState extends State<LoginScreen> {
           print("user name: ${user.user.uid}");
         }
       });
+      return "success";
     } catch (error) {
-      return error;
+      return error.toString();
     }
-  }
-
-  Future<bool> isNewUser(UserCredential user) async {
-    print("user name: ${user.user.uid}");
-    QuerySnapshot result = await FirebaseFirestore.instance
-        .collection("users")
-        .where("email", isEqualTo: user.user.email)
-        .get();
-    final List<DocumentSnapshot> docs = result.docs;
-    return docs.length == 0 ? true : false;
-  }
-
-  Future<void> addUserToDb(UserCredential user) async {
-    UserModel users = UserModel(
-      id: user.user.uid,
-      email: user.user.email,
-      name: user.user.displayName,
-      idwallet: "nonewallet",
-    );
-    await FirebaseFirestore.instance.collection("users").doc(users.id).set({
-      "id": users.id,
-      "name": users.name,
-      "email": users.email,
-      "idwallet": users.idwallet,
-    });
   }
 
   void _submitGoogle() async {
@@ -124,10 +100,10 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     // Run the create account method
-    String _loginFeedback = await googleSignIn();
+    String _loginFeedback = (await googleSignIn());
 
     // If the string is not null, we got error while create account.
-    if(_loginFeedback != null) {
+    if(_loginFeedback != "success") {
       _alertDialogBuilder(_loginFeedback);
 
       // Set the form to regular state [not loading].
@@ -144,10 +120,10 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     // Run the create account method
-    String _loginFeedback = await _loginAccount();
+    String _loginFeedback = (await _loginAccount());
 
     // If the string is not null, we got error while create account.
-    if(_loginFeedback != null) {
+    if(_loginFeedback != "success") {
       _alertDialogBuilder(_loginFeedback);
 
       // Set the form to regular state [not loading].
@@ -165,17 +141,20 @@ class _LoginScreenState extends State<LoginScreen> {
   String _loginPassword = "";
 
   // Focus Node for input fields
-  FocusNode _passwordFocusNode;
+  late FocusNode _passwordFocusNode;
+  late FocusNode _emailFocusNode;
 
   @override
   void initState() {
     _passwordFocusNode = FocusNode();
+    _emailFocusNode = FocusNode();
     super.initState();
   }
 
   @override
   void dispose() {
     _passwordFocusNode.dispose();
+    _emailFocusNode.dispose();
     super.dispose();
   }
 
@@ -217,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onSubmitted: (value){
                       _passwordFocusNode.requestFocus();
                     },
-                    textInputAction: TextInputAction.next,
+                    textInputAction: TextInputAction.next, isPasswordField: false, focusNode: _emailFocusNode,
                   ),
                   SizedBox(height: 16),
                   CustomInput(
@@ -229,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     isPasswordField: true,
                     onSubmitted: (value){
                       _submitForm();
-                    },
+                    }, textInputAction: TextInputAction.done,
                   ),
                   SizedBox(height: 16),
                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [

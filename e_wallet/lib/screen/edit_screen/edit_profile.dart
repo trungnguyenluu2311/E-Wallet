@@ -47,7 +47,7 @@ class _EditProfileState extends State<EditProfile> {
   void handleFormSubmit() async {
     if (_oldpassInputCtrl.text.isNotEmpty && _newpassInputCtrl.text.isNotEmpty) {
       User currentUser = FirebaseAuth.instance.currentUser;
-      UserCredential _authResult;
+      UserCredential? _authResult;
       try {
         _authResult = await currentUser.reauthenticateWithCredential(
           EmailAuthProvider.credential(

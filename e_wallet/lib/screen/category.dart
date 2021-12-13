@@ -92,7 +92,7 @@ class _CategoryState extends State<Category> {
           if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()));
           }
-          final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data);
+          final UserModel user = UserModel.fromDocumentSnapshot(documentSnapshot: snapshot.data!);
             return Scaffold(
               backgroundColor: Colors.black,
               appBar: AppBar(
@@ -124,7 +124,7 @@ class _CategoryState extends State<Category> {
                       if (snapshot.hasError) {
                         return Center(child: Text(snapshot.error.toString()));
                       }
-                      QuerySnapshot query = snapshot.data;
+                      QuerySnapshot query = snapshot.data!;
                       if(query.size == 0){
                         return Center(
                             child: Column(

@@ -57,7 +57,7 @@ class _CreateAccountState extends State<CreateAccount> {
           return e.toString();
         }
       }
-      return null;
+      return "success";
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         return 'The password provieded is too weak';
@@ -92,9 +92,9 @@ class _CreateAccountState extends State<CreateAccount> {
       });
 
       //run a create method
-      String _createAccountFeedback = await _createAccount();
+      String _createAccountFeedback = (await _createAccount());
 
-      if (_createAccountFeedback != null) {
+      if (_createAccountFeedback != "success") {
         _alterDialogBuilder(_createAccountFeedback);
 
         setState(() {
@@ -108,9 +108,10 @@ class _CreateAccountState extends State<CreateAccount> {
   }
 
   bool _registerFormLoading = false;
-  FocusNode _EmailFocusNode;
-  FocusNode _passwordFocusNode;
-  FocusNode _confirmPasswordFocusNode;
+  late FocusNode _nameFocusNode;
+  late FocusNode _EmailFocusNode;
+  late FocusNode _passwordFocusNode;
+  late FocusNode _confirmPasswordFocusNode;
   String _registerName = "";
   String _registerEmail = "";
   String _registerPassword = "";
@@ -119,12 +120,18 @@ class _CreateAccountState extends State<CreateAccount> {
   @override
   void initState() {
     _passwordFocusNode = FocusNode();
+    _nameFocusNode = FocusNode();
+    _EmailFocusNode = FocusNode();
+    _confirmPasswordFocusNode = FocusNode();
     super.initState();
   }
 
   @override
   void dispose() {
     _passwordFocusNode.dispose();
+    _nameFocusNode.dispose();
+    _EmailFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
     super.dispose();
   }
 
@@ -166,7 +173,7 @@ class _CreateAccountState extends State<CreateAccount> {
                       _EmailFocusNode.requestFocus();
                     },
                     hintText: "Full Name",
-                    textInputAction: TextInputAction.next,
+                    textInputAction: TextInputAction.next, isPasswordField: false, focusNode:_nameFocusNode ,
                   ),
                   SizedBox(height: 16),
                   CustomInput(
@@ -177,7 +184,7 @@ class _CreateAccountState extends State<CreateAccount> {
                       _passwordFocusNode.requestFocus();
                     },
                     hintText: "Email",
-                    textInputAction: TextInputAction.next,
+                    textInputAction: TextInputAction.next, focusNode: _EmailFocusNode, isPasswordField: false,
                   ),
                   SizedBox(height: 16),
                   CustomInput(
@@ -188,7 +195,7 @@ class _CreateAccountState extends State<CreateAccount> {
                     onSubmitted: (value) {
                       _confirmPasswordFocusNode.requestFocus();
                     },
-                    hintText: "Password",
+                    hintText: "Password", textInputAction: TextInputAction.next, focusNode: _passwordFocusNode,
                   ),
                   SizedBox(height: 16),
                   CustomInput(
@@ -200,7 +207,7 @@ class _CreateAccountState extends State<CreateAccount> {
                     onSubmitted: (value) {
                       _submitForm();
                     },
-                    hintText: "Password",
+                    hintText: "Password", textInputAction: TextInputAction.done,
                   ),
                   SizedBox(height: 16),
                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -234,23 +241,28 @@ class _CreateAccountState extends State<CreateAccount> {
                         )),
                   ]),
                   SizedBox(height: 66),
-                  Center(
-                    child: RichText(
-                      text: TextSpan(
-                          text: "Already have an account?",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFFCCCCCC),
-                              fontFamily: 'RobotoSlab',
-                              fontWeight: FontWeight.w700),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: " Sign in",
-                              style: TextStyle(
-                                  color: Color(0xFFCC0047),
-                                  fontWeight: FontWeight.w500),
-                            )
-                          ]),
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.pop(context);
+                    },
+                    child: Center(
+                      child: RichText(
+                        text: TextSpan(
+                            text: "Already have an account?",
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFFCCCCCC),
+                                fontFamily: 'RobotoSlab',
+                                fontWeight: FontWeight.w700),
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: " Sign in",
+                                style: TextStyle(
+                                    color: Color(0xFFCC0047),
+                                    fontWeight: FontWeight.w500),
+                              )
+                            ]),
+                      ),
                     ),
                   ),
                 ],

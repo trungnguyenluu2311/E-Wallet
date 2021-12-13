@@ -7,7 +7,7 @@ class ChartColumn {
   final charts.Color barColor;
 
   ChartColumn(
-      { this.thuchi,
-        this.barColor,
-        this.year});
+      { required this.thuchi,
+        required this.barColor,
+        required this.year});
 }
