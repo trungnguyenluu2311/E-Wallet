@@ -44,7 +44,7 @@ class _ConvertCurrencyState extends State<ConvertCurrency> {
                 style: TextStyle(
                     color: Colors.white,
                     fontFamily: 'RobotoSlab',
-                    fontSize: 35,
+                    fontSize: 25,
                     fontWeight: FontWeight.w700),
               )),
           body: Container(
@@ -119,6 +119,7 @@ class _ConvertCurrencyState extends State<ConvertCurrency> {
                           future: resFuture,
                           builder: (context, snapshot) {
                             if(snapshot.hasData){
+                              print("demo");
                               return _buildCurrencyView(toCountry, true,res:snapshot.data!);
                             }
                             return SizedBox.shrink();
@@ -192,12 +193,10 @@ class _ConvertCurrencyState extends State<ConvertCurrency> {
               key: isDestination ? Key(res.toString()) : Key(value.toString()),
               initialValue: isDestination ? res.toString() : value.toString(),
               onFieldSubmitted: (val){
-                if(double.parse(val)!=null){
-                  setState(() {
-                    value=double.parse(val);
-                    _requestConvert();
-                  });
-                }
+                setState(() {
+                  value=double.parse(val);
+                  _requestConvert();
+                });
               },
               decoration: InputDecoration(
                 hintText: '0.0',
@@ -234,7 +233,7 @@ class _ConvertCurrencyState extends State<ConvertCurrency> {
           Navigator.pop(context);
         });
       }),
-      cancelButton: CupertinoActionSheetAction(child: Text("Cancle"),
+      cancelButton: CupertinoActionSheetAction(child: Text("Cancel"),
         isDestructiveAction: true,
         onPressed: ()=>{
           Navigator.pop(context)

@@ -47,10 +47,13 @@ class _MoreScreenState extends State<MoreScreen> {
                       style: TextStyle(
                         color: Color(0xFFCCCCCC),
                         fontFamily: 'RobotoSlab',
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
-                    )
+                    ),
+                    SizedBox(
+                      height: 6,
+                    ),
                   ]),
                 ),
               ),
@@ -83,10 +86,13 @@ class _MoreScreenState extends State<MoreScreen> {
                     style: TextStyle(
                       color: Color(0xFFCCCCCC),
                       fontFamily: 'RobotoSlab',
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
-                  )
+                  ),
+                  SizedBox(
+                    height: 6,
+                  ),
                 ]),
               ),
             ))
@@ -120,10 +126,13 @@ class _MoreScreenState extends State<MoreScreen> {
                         style: TextStyle(
                           color: Color(0xFFCCCCCC),
                           fontFamily: 'RobotoSlab',
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
-                      )
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
                     ]),
                   ),
                 )),
@@ -160,7 +169,7 @@ class _MoreScreenState extends State<MoreScreen> {
                           style: TextStyle(
                             color: Color(0xFFCCCCCC),
                             fontFamily: 'RobotoSlab',
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                           ),
                         )
